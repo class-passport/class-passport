@@ -1,0 +1,19 @@
+{
+  "name": "back-end-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jessicamvs/back-end-project.git"
+  },
+  "author": "Jessica Vasquez-Soltero, Jonathan Daniel, Carolina Ceja, Jacob Isenberg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jessicamvs/back-end-project/issues"
+  },
+  "homepage": "https://github.com/jessicamvs/back-end-project#readme"
+}
