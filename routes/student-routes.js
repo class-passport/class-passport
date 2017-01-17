@@ -30,6 +30,6 @@ router.put('/students', bearerAuth, (req, res, next) => {
 
 router.delete('/students', bearerAuth, (req, res, next) => {
   Student.findByIdAndRemove(req.student._id)
-    .then(() => res.status(204))
+    .then(() => res.status(204).end())
     .catch(next);
 });
