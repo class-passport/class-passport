@@ -27,7 +27,7 @@ app.use(morgan('dev'));
 app.use(jsonParser);
 app.use(authRoutes);
 app.use(studentRoutes);
-// app.use(ccCourseRoutes);
+app.use(ccCourseRoutes);
 // app.use(uwCourseRoutes);
 app.use(errorMiddlware);
 
