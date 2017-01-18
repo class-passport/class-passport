@@ -1,6 +1,7 @@
 'use strict';
 
 // npm modules
+const createError = require('http-errors');
 const Router = require('express').Router;
 
 // app modules
@@ -11,6 +12,8 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const router = module.exports = new Router();
 
 router.post('/cccourses', bearerAuth, (req, res, next) => {
+  if(!req.student) return next(createError(401));
+
   // STUDENTS FUNCTIONALITY: Adds course to curr_courses (PUT?)
   CCCourse.findAndAddCourse(req.body.code, req.student)
     .then(student => res.json(student))
@@ -24,20 +27,22 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
 });
 
 router.get('/cccourses', bearerAuth, (req, res, next) => {
-  // STUDENT and ADMIN: Same functionality
+  // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
   CCCourse.find({})
     .then(courses => res.json(courses))
     .catch(next);
 });
 
 router.get('/cccourses/:id', bearerAuth, (req, res, next) => {
-  // STUDENT and ADMIN: Same functionality
+  // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
   CCCourse.findById(req.params.id)
     .then(course => res.json(course))
     .catch(next);
 });
 
 router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
+  if(!req.student) return next(createError(401));
+
   // STUDENT: Not authorized
   // ADMIN: Only admin is permitted to update a course
   CCCourse.findByIdAndUpdate(req.params.id, req.body, {new:true})
@@ -46,6 +51,8 @@ router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
 });
 
 router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
+  if(!req.student) return next(createError(401));
+
   //STUDENT FUNCTIONALITY: Removes course from curr_courses
   req.student.removeCurrCourse(req.params.id)
     .then(student => res.json(student))
