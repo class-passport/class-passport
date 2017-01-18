@@ -43,4 +43,14 @@ studentSchema.methods.generateToken = function() {
   });
 };
 
+studentSchema.methods.removeCurrCourse = function(courseId) {
+  const index = this.curr_courses.indexOf(courseId);
+  if(index > -1) {
+    this.curr_courses.splice(index, 1);
+  }
+
+  return this.save()
+    .then(student => student);
+};
+
 module.exports = mongoose.model('students', studentSchema);
