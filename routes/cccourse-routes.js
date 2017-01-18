@@ -1,6 +1,7 @@
 'use strict';
 
 // npm modules
+const createError = require('http-errors');
 const Router = require('express').Router;
 
 // app modules
@@ -16,12 +17,16 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
   // student.curr_courses array and save changes. If the course is
   // not found then create an error telling user that course is not
   // offered.
+  // this should probably be in the PUT route
+  CCCourse.findAndAddCourse(req.body.code, req.student)
+    .then(student => res.json(student))
+    .catch(next);
 
   // ADMIN: creates new course
-  const course = new CCCourse(req.body);
-  course.save()
-    .then(course => res.json(course))
-    .catch(next);
+  // const course = new CCCourse(req.body);
+  // course.save()
+  //   .then(course => res.json(course))
+  //   .catch(next);
 });
 
 router.get('/cccourses', bearerAuth, (req, res, next) => {
