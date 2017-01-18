@@ -1,7 +1,6 @@
 'use strict';
 
 // npm modules
-const createError = require('http-errors');
 const Router = require('express').Router;
 
 // app modules
@@ -51,21 +50,24 @@ router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
 });
 
 router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
-  //STUDENT: deletes ($pulls) a selected course from curr_courses by id
+  //STUDENT: deletes a selected course from curr_courses by id
+  req.student.removeCurrCourse(req.params.id)
+    .then(student => res.json(student))
+    .catch(next);
 
   //ADMIN: ideally only an admin would be able to remove a course from collection
-  CCCourse.findByIdAndRemove(req.params.id)
-    .then(() => res.status(204).end())
-    .catch(next);
+  // CCCourse.findByIdAndRemove(req.params.id)
+  //   .then(() => res.status(204).end())
+  //   .catch(next);
 });
 
-router.get('/cccourses', (req, res) => {
-  CCCourse.find({})
-    .then(courses => {
-      res.write('list of community college courses:' + '\n');
-      courses.forEach(function(course) {
-        res.write(course.code + '\n');
-      });
-      res.end();
-    });
-});
+// router.get('/cccourses', (req, res) => {
+//   CCCourse.find({})
+//     .then(courses => {
+//       res.write('list of community college courses:' + '\n');
+//       courses.forEach(function(course) {
+//         res.write(course.code + '\n');
+//       });
+//       res.end();
+//     });
+// });
