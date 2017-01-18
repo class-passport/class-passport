@@ -19,12 +19,17 @@
   "dependencies": {
     "bcrypt": "^1.0.2",
     "body-parser": "^1.15.2",
+    "chai": "^3.5.0",
     "express": "^4.14.0",
     "http-errors": "^1.5.1",
     "jsonwebtoken": "^7.2.1",
-    "mongoose": "^4.7.7"
+    "mocha": "^3.2.0",
+    "mongoose": "^4.7.7",
+    "morgan": "^1.7.0",
+    "superagent": "^3.3.2"
   },
   "devDependencies": {
+    "mongoose": "^4.7.7",
     "morgan": "^1.7.0"
   }
 }
