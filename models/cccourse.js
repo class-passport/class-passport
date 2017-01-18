@@ -1,10 +1,9 @@
 'use strict';
 
 let mongoose = require('mongoose');
-let Schema = mongoose.Schema;
-//
-const cccourseSchema = Schema({
-  code: {type: String, required: true},
+
+let cccourseSchema = mongoose.Schema({
+  code: {type: String, required: true}
 });
-//
-module.exports = mongoose.model('course', cccourseSchema);
+
+module.exports = mongoose.model('cccourses', cccourseSchema);

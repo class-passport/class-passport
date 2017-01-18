@@ -8,47 +8,46 @@ let bearerAuth = require('../lib/bearer-auth-middleware.js');
 
 const router = module.exports = new Router();
 
-router.post('/cccourses', bearerAuth, function(req, res, next) {
-  CCCourse.save(req.body)
-  .then(course => res.json(course))
-  .catch(next);
-
-  // CCCourses.find({code: req.body.code})
-  // .then( course => res.json(course))
-  // .catch(next);
-  //res.json(course)
-  //student should not be allowed to add a course that is not offered
-  //at the CC. In this case res.json({msg: 'course not offered}).
-  //if course is offered then add to students course's array
+router.post('/cccourse', bearerAuth, (req, res) => {
+  const course = new CCCourse(req.body);
+  course.save()
+  .catch(function(err) {
+    console.log(err);
+  });
+  res.json(course);
 });
 
 router.get('/cccourses', bearerAuth, function(req, res, next) {
+  // returns all courses for both student and admin(if used)
   CCCourse.find({})
   .then(courses => res.json(courses))
   .catch(next);
-  //res.json(student.courses)
-  //should return an array of all the students community college courses
 });
 
-router.get('/cccourses/:id', bearerAuth, function(req, res, next) {
-  CCCourse.findById(req.student._id)
+router.put('/cccourses/:id', bearerAuth, function(req, res, next) {
+  //ideally only admins would be able to update a course
+  CCCourse.findById(req.params.id)
+  .then(course => {
+    return CCCourse.findByIdAndUpdate(course._id, req.body, {new:true});
+  })
   .then(course => res.json(course))
   .catch(next);
-  //res.json(course)
-  //should return one course
 });
-
-router.delete('/cccourses', bearerAuth, function(req, res, next) {
-  req.user.currCourses = [];
-  //res.status(204).end()
-  //this deletes all courses in the student's courses array.
-  //does not effect cc catalog
-});
-
+//
+// router.delete('/cccourses', bearerAuth, function(req, res, next) {
+//   req.user.currCourses = [];
+//   //res.status(204).end()
+//   //this deletes all courses in the student's courses array.
+//   //does not effect cc catalog
+// });
+//
 router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
-  //res.status(204).end()
-  //this deletes this specific course from the student's courses array
-  CCCourse.findByIdAndRemove(req.params.id)
+  //deletes a selected course by id
+  //ideally only an admin would be able to do this
+  CCCourse.findById(req.params.id)
+  .then(course => {
+    return CCCourse.remove({_id: course._id});
+  })
   .then(() => res.status(204).send())
-  .catch(err => next(createError(404, 'Not Found')));
+  .catch(err => next(createError(401, 'invalid id')));
 });

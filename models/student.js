@@ -1,15 +1,16 @@
 'use strict';
 
 let mongoose = require('mongoose');
-let Schema = mongoose.Schema;
 let bcrypt = require('bcrypt');
-let jwt = require('jsonwebtoken');
 let createError = require('http-errors');
+let jwt = require('jsonwebtoken');
 
-const studentSchema = Schema({
-  name: {type: String, required: true},
+let studentSchema = mongoose.Schema({
+  username: {type: String, required: true, unique: true},
   password: {type: String, required: true},
-  currCourses: [{type: Schema.Types.ObjectId, ref: 'course'}]
+  curr_courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'cccourses'}],
+  univ_credits: {type: Number},
+  univ_classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'uwcourses'}]
 });
 
 studentSchema.methods.hashPassword = function(password) {
@@ -22,18 +23,24 @@ studentSchema.methods.hashPassword = function(password) {
   });
 };
 
-studentSchema.methods.comparePasswords = function(plainTextPass) {
-  return new Promise((resolve, reject) => {
-    bcrypt.compare(plainTextPass, this.password, (err, result) => {
+studentSchema.methods.comparePasswords = function(password) {
+  return new Promise ((resolve, reject) => {
+    bcrypt.compare(password, this.password, (err, valid) => {
       if (err) return reject(err);
-      if (!result) return reject(createError(401, 'Wrong Password'));
+      if(!valid) return reject(createError(401, 'wrong password http error'));
       resolve(this);
     });
   });
 };
 
 studentSchema.methods.generateToken = function() {
-  return Promise.resolve(jwt.sign({id: this._id}, process.env.SECRET || 'DEV'));
+  return new Promise ((resolve, reject) => {
+    let token = jwt.sign({id: this._id}, process.env.SECRET || 'DEV');
+    if(!token) {
+      reject('could not generate token');
+    }
+    resolve(token);
+  });
 };
 
-module.exports = mongoose.model('student', studentSchema);
+module.exports = mongoose.model('students', studentSchema);
