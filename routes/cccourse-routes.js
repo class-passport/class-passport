@@ -2,7 +2,7 @@
 
 let Router = require('express').Router;
 
-let CCCourse = require('../models/cccourse.js');
+let CCcourse = require('../models/cccourse.js');
 let bearerAuth = require('../lib/bearer-auth-middleware.js');
 
 
@@ -16,7 +16,7 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
   // offered.
 
   // ADMIN: creates new course
-  const course = new CCCourse(req.body);
+  const course = new CCcourse(req.body);
   course.save()
   .then(course => res.json(course))
   .catch(next);
@@ -24,14 +24,14 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
 
 router.get('/cccourses', bearerAuth, (req, res, next) => {
   // STUDENT and ADMIN: returns all courses for both student and admin(if used)
-  CCCourse.find({})
+  CCcourse.find({})
   .then(courses => res.json(courses))
   .catch(next);
 });
 
 router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
   //ADMIN: ideally only admins would be able to update a course
-  CCCourse.findByIdAndUpdate(req.params._id, req.body, {new:true})
+  CCcourse.findByIdAndUpdate(req.params._id, req.body, {new:true})
   .then(course => res.json(course))
   .catch(next);
 });
@@ -41,7 +41,18 @@ router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
   //STUDENT: deletes ($pulls) a selected course from curr_courses by id
 
   //ADMIN: ideally only an admin would be able to remove a course from collection
-  CCCourse.findByIdAndRemove(req.params.id)
+  CCcourse.findByIdAndRemove(req.params.id)
   .then(() => res.status(204).end())
   .catch(next);
+});
+
+router.get('/cccourses', (req, res) => {
+  CCcourse.find({})
+  .then(courses => {
+    res.write('list of community college courses:' + '\n');
+    courses.forEach(function(course) {
+      res.write(course.code + '\n');
+    });
+    res.end();
+  });
 });
