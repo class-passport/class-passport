@@ -23,9 +23,11 @@
     "jsonwebtoken": "^7.2.1",
     "mocha": "^3.2.0",
     "mongoose": "^4.7.7",
+    "morgan": "^1.7.0",
     "superagent": "^3.3.2"
   },
   "devDependencies": {
+    "mongoose": "^4.7.7",
     "morgan": "^1.7.0"
   }
 }

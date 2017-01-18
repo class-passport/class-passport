@@ -178,55 +178,55 @@ describe('testing student rotues', function(){
       });
 
       //prevent a student from updating another student's courses
-      it('should prevent a student from updating another student\'s courses', function(){
-        request.post('localhost:3000/student/cccourse')
-        .auth('Bearer', )
-
-          //THIS WILL HAVE TO WAIT UNTIL EVERYTHING ELSE IS DONE BUT BASICALLY WE'RE GOING TO LET BOB LOG IN AS BOB AND THEN HAVE HIM CHANGE SOMETHING...OR TRY TO TO CHANGE SALLY'S COURSES (LIKE SAY WE WANT TO UPDATE RECORD ID 6), THEN ENSURE THAT NOT ONLY DID HE FAIL, BUT RECORD ID 6 IS THE SAME AS IT WAS BEFORE.
-      })
+      // it('should prevent a student from updating another student\'s courses', function(){
+      //   request.post('localhost:3000/student/cccourse')
+      //   .auth('Bearer', )
+      //
+      //     //THIS WILL HAVE TO WAIT UNTIL EVERYTHING ELSE IS DONE BUT BASICALLY WE'RE GOING TO LET BOB LOG IN AS BOB AND THEN HAVE HIM CHANGE SOMETHING...OR TRY TO TO CHANGE SALLY'S COURSES (LIKE SAY WE WANT TO UPDATE RECORD ID 6), THEN ENSURE THAT NOT ONLY DID HE FAIL, BUT RECORD ID 6 IS THE SAME AS IT WAS BEFORE.
+      // })
 
 
     });
 
     // testing DELETE errors/messages
-      describe('testing DELETE /students functionality', function(){
-        //allow a student to delete a course from their course listing
-        it('should allow a student to delete a course from their course listing', function(){
-          request.get('localhost:3000/student/cccourse')
-          .auth('Bearer', token, {type:'auto'})
-          .send({make: 'usertestafa', model:'testpass'})
-          //student.deleteOne(coursename)
-          .end((err, res) => {
-            if (err) return (err);
-            expect(res.status).to.equal(200);
-            expect(res.body.username).to.equal('usertestafa');
-            expect(res.body).to.not.have.property('password');
-          });
-        });
-
-        //allow a student to delete their own profile
-        it('should return a 401 error if a token was not provided', function(){
-          request.get('localhost:3000/users')
-          .auth('Bearer', '', {type:'auto'})
-          .send({make: 'usertestafa', model:'testpass'})
-          .end((err, res) => {
-            expect(res.status).to.equal(401);
-            // done();
-          });
-        });
-
-        // prevent a student from deleting another student
-        // it('should return a 404 error if the id provided was not found', function(){
-        //   request.get('localhost:3000/users')
-        //   .auth('Bearer', 'badToken', {type: 'auto'})
-        //   .send({make: 'usertestafa', model:'testpass'})
-        //   .end((err, res) =>{
-        //     expect(res.status).to.equal(404);
-        //   });
-        // });
-
-        //prevent a student from deleting a cc course
-      });
+      // describe('testing DELETE /students functionality', function(){
+      //   //allow a student to delete a course from their course listing
+      //   it('should allow a student to delete a course from their course listing', function(){
+      //     request.get('localhost:3000/student/cccourse')
+      //     .auth('Bearer', token, {type:'auto'})
+      //     .send({make: 'usertestafa', model:'testpass'})
+      //     //student.deleteOne(coursename)
+      //     .end((err, res) => {
+      //       if (err) return (err);
+      //       expect(res.status).to.equal(200);
+      //       expect(res.body.username).to.equal('usertestafa');
+      //       expect(res.body).to.not.have.property('password');
+      //     });
+      //   });
+      //
+      //   //allow a student to delete their own profile
+      //   it('should return a 401 error if a token was not provided', function(){
+      //     request.get('localhost:3000/users')
+      //     .auth('Bearer', '', {type:'auto'})
+      //     .send({make: 'usertestafa', model:'testpass'})
+      //     .end((err, res) => {
+      //       expect(res.status).to.equal(401);
+      //       // done();
+      //     });
+      //   });
+      //
+      //   // prevent a student from deleting another student
+      //   // it('should return a 404 error if the id provided was not found', function(){
+      //   //   request.get('localhost:3000/users')
+      //   //   .auth('Bearer', 'badToken', {type: 'auto'})
+      //   //   .send({make: 'usertestafa', model:'testpass'})
+      //   //   .end((err, res) =>{
+      //   //     expect(res.status).to.equal(404);
+      //   //   });
+      //   // });
+      //
+      //   //prevent a student from deleting a cc course
+      // });
 
 
   // after(function(done) {
