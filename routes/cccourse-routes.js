@@ -11,17 +11,12 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const router = module.exports = new Router();
 
 router.post('/cccourses', bearerAuth, (req, res, next) => {
-  // STUDENTS: students req will search course collection and if course
-  // is offered (found by code), then push course._id into
-  // student.curr_courses array and save changes. If the course is
-  // not found then create an error telling user that course is not
-  // offered.
-  // this should probably be in the PUT route
+  // STUDENTS FUNCTIONALITY: Adds course to curr_courses (PUT?)
   CCCourse.findAndAddCourse(req.body.code, req.student)
     .then(student => res.json(student))
     .catch(next);
 
-  // ADMIN: creates new course
+  // ADMIN FUNCTIONALITY: Creates New Course
   // const course = new CCCourse(req.body);
   // course.save()
   //   .then(course => res.json(course))
@@ -29,33 +24,34 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
 });
 
 router.get('/cccourses', bearerAuth, (req, res, next) => {
-  // STUDENT and ADMIN: returns all courses for both student and admin(if used)
+  // STUDENT and ADMIN: Same functionality
   CCCourse.find({})
     .then(courses => res.json(courses))
     .catch(next);
 });
 
 router.get('/cccourses/:id', bearerAuth, (req, res, next) => {
-  // STUDENT and ADMIN: returns one course for both student and admin(if used)
+  // STUDENT and ADMIN: Same functionality
   CCCourse.findById(req.params.id)
     .then(course => res.json(course))
     .catch(next);
 });
 
 router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
-  //ADMIN: ideally only admins would be able to update a course
+  // STUDENT: Not authorized
+  // ADMIN: Only admin is permitted to update a course
   CCCourse.findByIdAndUpdate(req.params.id, req.body, {new:true})
     .then(course => res.json(course))
     .catch(next);
 });
 
 router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
-  //STUDENT: deletes a selected course from curr_courses by id
+  //STUDENT FUNCTIONALITY: Removes course from curr_courses
   req.student.removeCurrCourse(req.params.id)
     .then(student => res.json(student))
     .catch(next);
 
-  //ADMIN: ideally only an admin would be able to remove a course from collection
+  //ADMIN: Removes a course from collection
   // CCCourse.findByIdAndRemove(req.params.id)
   //   .then(() => res.status(204).end())
   //   .catch(next);
