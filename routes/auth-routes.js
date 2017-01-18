@@ -19,9 +19,9 @@ router.post('/signup', (req, res, next) => {
 });
 
 router.get('/login', basicAuth, (req, res, next) => {
-  Student.findOne({name: req.auth.name})
+  Student.findOne({username: req.auth.username})
     .then(student => student.comparePasswords(req.auth.password))
     .then(student => student.generateToken())
     .then(token => res.json(token))
-    .catch(next);
+    .catch(next); //defaults internal server error if auth is incorrect
 });
