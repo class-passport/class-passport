@@ -24,6 +24,30 @@ router.get('/students', bearerAuth, (req, res, next) => {
   else return next(createError(401));
 });
 
+router.get('/students/cccourses', bearerAuth, (req, res, next) => {
+  //THIS IS UNTESTED IN ANY WAY AS OF 1/18/2017
+  if(!req.user) return next(createError(401));
+  User.findById(req.user._id)
+    .populate('curr_courses')
+    .exec(function(err, courseList) {
+      if (err) {
+        console.log(err);
+        console.log('FIRST ERR');
+        return next(createError(401));
+      }
+      courseList.forEach(function(course) {
+        res.write(course);
+      });
+    })
+    .catch(function(err) {
+      if(err) {
+        console.log('SECOND ERR');
+        console.log(err);
+        return next(createError(401));
+      }
+    });
+});
+
 
 router.put('/students', bearerAuth, (req, res, next) => {
   if(!req.user) return next(createError(401));
