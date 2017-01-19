@@ -5,15 +5,16 @@ let bcrypt = require('bcrypt');
 let createError = require('http-errors');
 let jwt = require('jsonwebtoken');
 
-let studentSchema = mongoose.Schema({
+let userSchema = mongoose.Schema({
   username: {type: String, required: true, unique: true},
   password: {type: String, required: true},
   curr_courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'cccourses'}],
   univ_credits: {type: Number},
-  univ_classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'uwcourses'}]
+  univ_classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'uwcourses'}],
+  admin: {type: Boolean, required: true}
 });
 
-studentSchema.methods.hashPassword = function(password) {
+userSchema.methods.hashPassword = function(password) {
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) return reject(err);
@@ -23,7 +24,7 @@ studentSchema.methods.hashPassword = function(password) {
   });
 };
 
-studentSchema.methods.comparePasswords = function(password) {
+userSchema.methods.comparePasswords = function(password) {
   return new Promise ((resolve, reject) => {
     bcrypt.compare(password, this.password, (err, valid) => {
       if (err) return reject(err);
@@ -33,7 +34,7 @@ studentSchema.methods.comparePasswords = function(password) {
   });
 };
 
-studentSchema.methods.generateToken = function() {
+userSchema.methods.generateToken = function() {
   return new Promise ((resolve, reject) => {
     let token = jwt.sign({id: this._id}, process.env.SECRET || 'DEV');
     if(!token) {
@@ -43,14 +44,14 @@ studentSchema.methods.generateToken = function() {
   });
 };
 
-studentSchema.methods.removeCurrCourse = function(courseId) {
+userSchema.methods.removeCurrCourse = function(courseId) {
   const index = this.curr_courses.indexOf(courseId);
   if(index > -1) {
     this.curr_courses.splice(index, 1);
   }
 
   return this.save()
-    .then(student => student);
+    .then(user => user);
 };
 
-module.exports = mongoose.model('students', studentSchema);
+module.exports = mongoose.model('users', userSchema);
