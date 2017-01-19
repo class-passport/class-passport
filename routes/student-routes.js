@@ -40,3 +40,7 @@ router.delete('/students', bearerAuth, (req, res, next) => {
     .then(() => res.status(204).end())
     .catch(next);
 });
+
+router.get('/*', (req, res, next) => {
+  next(createError(404));
+});
