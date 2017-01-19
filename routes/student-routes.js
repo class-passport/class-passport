@@ -37,6 +37,7 @@ router.get('/students/cccourses', bearerAuth, (req, res, next) => {
       }
       courseList.forEach(function(course) {
         res.write(course);
+        res.end();
       });
     })
     .catch(function(err) {
