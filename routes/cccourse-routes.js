@@ -12,31 +12,29 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const router = module.exports = new Router();
 
 router.post('/cccourses', bearerAuth, (req, res, next) => {
-  // if(!req.student) return next(createError(401));
+  if(!req.user) return next(createError(401));
 
   // ADMIN FUNCTIONALITY: Creates New Course
-  if(!req.body.admin) {
-    console.log('SHIT!');
-    CCCourse.findAndAddCourse(req.body.code, req.student)
-    .then(student => res.json(student))
-    .catch(next);
-  } else {
-    console.log('MADE IT HERE');
+  if(req.user.admin) {
     const course = new CCCourse(req.body);
     course.save()
       .then(course => res.json(course))
       .catch(next);
+  } else {
+    CCCourse.findAndAddCourse(req.body.code, req.user)
+    .then(user => res.json(user))
+    .catch(next);
   }
 });
 
-router.get('/cccourses', bearerAuth, (req, res, next) => {
+router.get('/cccourses', (req, res, next) => {
   // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
   CCCourse.find({})
     .then(courses => res.json(courses))
     .catch(next);
 });
 
-router.get('/cccourses/:id', bearerAuth, (req, res, next) => {
+router.get('/cccourses/:id', (req, res, next) => {
   // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
   CCCourse.findById(req.params.id)
     .then(course => res.json(course))

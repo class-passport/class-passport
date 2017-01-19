@@ -34,8 +34,8 @@ app.use(errorMiddlware);
 module.exports = app;
 
 // start server
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log('listening on PORT', PORT);
-  });
-}
+// if (require.main === module) {
+// }
+app.listen(PORT, () => {
+  console.log('listening on PORT', PORT);
+});
