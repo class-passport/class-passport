@@ -3,25 +3,25 @@
 // app modules
 const Router = require('express').Router;
 const basicAuth = require('../lib/basic-auth-middleware.js');
-const Student = require('../models/student.js');
+const User = require('../models/user.js');
 
 // module constants
 const router = module.exports = new Router();
 
 router.post('/signup', (req, res, next) => {
-  const student = new Student(req.body);
+  const user = new User(req.body);
 
-  student.hashPassword(student.password)
-    .then(student => student.save())
-    .then(student => student.generateToken())
+  user.hashPassword(user.password)
+    .then(user => user.save())
+    .then(user => user.generateToken())
     .then(token => res.json(token))
     .catch(next);
 });
 
 router.get('/login', basicAuth, (req, res, next) => {
-  Student.findOne({username: req.auth.username})
-    .then(student => student.comparePasswords(req.auth.password))
-    .then(student => student.generateToken())
+  User.findOne({username: req.auth.username})
+    .then(user => user.comparePasswords(req.auth.password))
+    .then(user => user.generateToken())
     .then(token => res.json(token))
     .catch(next); //defaults internal server error if auth is incorrect
 });

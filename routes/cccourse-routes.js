@@ -12,18 +12,21 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const router = module.exports = new Router();
 
 router.post('/cccourses', bearerAuth, (req, res, next) => {
-  if(!req.student) return next(createError(401));
-
-  // STUDENTS FUNCTIONALITY: Adds course to curr_courses (PUT?)
-  CCCourse.findAndAddCourse(req.body.code, req.student)
-    .then(student => res.json(student))
-    .catch(next);
+  // if(!req.student) return next(createError(401));
 
   // ADMIN FUNCTIONALITY: Creates New Course
-  // const course = new CCCourse(req.body);
-  // course.save()
-  //   .then(course => res.json(course))
-  //   .catch(next);
+  if(!req.body.admin) {
+    console.log('SHIT!');
+    CCCourse.findAndAddCourse(req.body.code, req.student)
+    .then(student => res.json(student))
+    .catch(next);
+  } else {
+    console.log('MADE IT HERE');
+    const course = new CCCourse(req.body);
+    course.save()
+      .then(course => res.json(course))
+      .catch(next);
+  }
 });
 
 router.get('/cccourses', bearerAuth, (req, res, next) => {
@@ -63,14 +66,3 @@ router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
   //   .then(() => res.status(204).end())
   //   .catch(next);
 });
-
-// router.get('/cccourses', (req, res) => {
-//   CCCourse.find({})
-//     .then(courses => {
-//       res.write('list of community college courses:' + '\n');
-//       courses.forEach(function(course) {
-//         res.write(course.code + '\n');
-//       });
-//       res.end();
-//     });
-// });
