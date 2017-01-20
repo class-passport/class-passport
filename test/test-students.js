@@ -1,79 +1,73 @@
 let request = require('superagent');
 let expect = require('chai').expect;
-require('../index.js');
+let app = require('../index.js');
 let User = require('../models/user');
 let CC = require('../models/cccourse');
-
-
+let PORT = process.env.PORT || 3000;
 
 describe('testing student rotues', function(){
+  let server;
   let student;
   let token;
   let course;
 
-  it('testing coveralls', function(){
+  before(function(done) {
+    server = app.listen(PORT, () => console.log('started tests from student tests'));
 
+    let tmp = new User({username: 'sallyhardesty', password: 'testpass', admin: false});
+    tmp.save()
+    .then(u => {
+      student = u;
+      u.generateToken()
+      .then(tok => {
+        token = tok;
+        console.log('token', token);
+      });
+    });
+    let cmp = new CC({code: 'Eng 101'});
+    cmp.save()
+    .then(c => {
+      course = c;
+      console.log('course', course);
+      done();
+    });
   });
 
-  // before(function(done) {
-  //   let tmp = new User({username: 'sallyhardesty', password: 'testpass'});
-  //   tmp.save()
-  //   .then(u => {
-  //     student = u;
-  //     u.generateToken()
-  //     .then(tok => {
-  //       token = tok;
-  //       console.log('token', token);
-  //     });
-  //   });
-  //   let cmp = new CC({code: 'Eng 101'});
-  //   cmp.save()
-  //   .then(c => {
-  //     course = c;
-  //     console.log('course', course);
-  //     done();
-  //   });
-  // });
-  //
-  // after(function(done) {
-  //   User.remove({_id:student._id}).exec();
-  //   CC.remove({_id:course._id}).exec();
-  //   done();
-  // });
-  //
-  //
-  //
+  after(function(done) {
+    User.remove({_id:student._id}).exec();
+    CC.remove({_id:course._id}).exec();
 
-//
+    server.close(() => console.log('server closed after student tests'));
+    done();
+  });
+
 // //Unregistered route
-  // describe('testing unregistered route', function(){
-  //   it('should return 404 for an unregistered route', function(done) {
-  //     request.get('http://localhost:3000/stuff')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(500);
-  //       done();
-  //     });
-  //   });
-  // });
-//
-//
-//
+  describe('testing unregistered route', function(){
+    it('should return 404 for an unregistered route', function(done) {
+      request.get('http://localhost:3000/stuff')
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
+  });
+
 // // test POST errors/messages
   describe('testing POST /students functionality', function(){
 
    //student adds a new course to their personal course list
-    // it('should add a new course to a studen\'s personal course list', function(done){
-    //   request.post('localhost:3000/cccourses')
-    //   .set('Authorization', 'Bearer ' + token)
-    //   .set('Accept', 'application/json')
-    //   .send({code: 'Eng 101'})
-    //   .end((err, res) => {
-    //     expect(res.status).to.equal(200);
-    //     expect(res.body.curr_courses.length).to.equal(1);
-    //     done();
-    //   });
-    // });
-//
+    it('should add a new course to a studen\'s personal course list', function(done){
+      request.post('localhost:3000/cccourses')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Accept', 'application/json')
+      .send({code: 'Eng 101'})
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.curr_courses.length).to.equal(1);
+        done();
+      });
+    });
+
 //       //prevent a student from adding a course to the cc
 //     it('should not allow a student to add a course to the Community College', function(done){
 //       request.post('localhost:3000/cccourses')
