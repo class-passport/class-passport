@@ -13,7 +13,7 @@ const router = module.exports = new Router();
 
 router.get('/students', bearerAuth, (req, res, next) => {
   if(!req.user) return next(createError(401));
-  if(req.user.admin === false) {
+  if(!req.user.admin) {
     User.findById(req.user._id)
     .then(user => {
       delete user.password;
@@ -37,8 +37,8 @@ router.get('/students/cccourses', bearerAuth, (req, res, next) => {
       }
       courseList.forEach(function(course) {
         res.write(course);
-        res.end();
       });
+      res.end('great success');
     })
     .catch(function(err) {
       if(err) {
