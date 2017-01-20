@@ -1,18 +1,20 @@
 let request = require('superagent');
 let expect = require('chai').expect;
-require('../index.js');
-let User = require('../models/student');
+let app = require('../index.js');
+let User = require('../models/user');
 let CC = require('../models/cccourse');
-
-
+let PORT = process.env.PORT || 3000;
 
 describe('testing student rotues', function(){
+  let server;
   let student;
   let token;
   let course;
 
   before(function(done) {
-    let tmp = new User({username: 'sallyhardesty', password: 'testpass'});
+    server = app.listen(PORT, () => console.log('started tests from student tests'));
+
+    let tmp = new User({username: 'sallyhardesty', password: 'testpass', admin: false});
     tmp.save()
     .then(u => {
       student = u;
@@ -34,26 +36,22 @@ describe('testing student rotues', function(){
   after(function(done) {
     User.remove({_id:student._id}).exec();
     CC.remove({_id:course._id}).exec();
+
+    server.close(() => console.log('server closed after student tests'));
     done();
   });
 
-
-
-
-//
 // //Unregistered route
-  // describe('testing unregistered route', function(){
-  //   it('should return 404 for an unregistered route', function(done) {
-  //     request.get('http://localhost:3000/stuff')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(500);
-  //       done();
-  //     });
-  //   });
-  // });
-//
-//
-//
+  describe('testing unregistered route', function(){
+    it('should return 404 for an unregistered route', function(done) {
+      request.get('http://localhost:3000/stuff')
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
+  });
+
 // // test POST errors/messages
   describe('testing POST /students functionality', function(){
 
@@ -69,7 +67,7 @@ describe('testing student rotues', function(){
         done();
       });
     });
-//
+
 //       //prevent a student from adding a course to the cc
 //     it('should not allow a student to add a course to the Community College', function(done){
 //       request.post('localhost:3000/cccourses')
@@ -102,7 +100,7 @@ describe('testing student rotues', function(){
 //         expect(res.status).to.equal(401);
 //         done();
 //       });
-    });
+  });
 //
 //
 //     it('should return a 401 error if no token was provided for a student', function(done){
