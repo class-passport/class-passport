@@ -27,22 +27,34 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
   }
 });
 
+
+
+// STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
 router.get('/cccourses', (req, res, next) => {
-  // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
+  // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality, pulling back all courses offered by the CC
   CCCourse.find({})
-    .then(courses => res.json(courses))
-    .catch(next);
+   .then(courses => {
+     courses.forEach(function(course) {
+       res.write(course + '\n');
+     });
+     res.end();
+   })
+  .catch(next);
 });
 
 router.get('/cccourses/:id', (req, res, next) => {
-  // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
+  // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality, pulling back a single course offered by the CC
   CCCourse.findById(req.params.id)
-    .then(course => res.json(course))
+    .then(course => {
+      console.log('coursething', course);
+      res.json(course);
+
+    })
     .catch(next);
 });
 
 router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
-  if(!req.student) return next(createError(401));
+  if(!req.user.admin) return next(createError(401));
 
   // STUDENT: Not authorized
   // ADMIN: Only admin is permitted to update a course
@@ -63,4 +75,8 @@ router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
   // CCCourse.findByIdAndRemove(req.params.id)
   //   .then(() => res.status(204).end())
   //   .catch(next);
+
+  router.get('/*', (req, res, next) => {
+  next(createError(404));
+});
 });
