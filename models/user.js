@@ -16,7 +16,7 @@ let userSchema = mongoose.Schema({
 
 userSchema.methods.hashPassword = function(password) {
   if(!password) return Promise.reject(createError(400));
-  
+
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) return reject(err);

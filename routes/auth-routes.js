@@ -23,7 +23,7 @@ router.get('/login', basicAuth, (req, res, next) => {
   User.findOne({username: req.auth.username})
     .then(user => {
       if(!user) return next(createError(401));
-      user.comparePasswords(req.auth.password);
+      return user.comparePasswords(req.auth.password);
     })
     .then(user => user.generateToken())
     .then(token => res.json(token))
