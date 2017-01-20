@@ -145,25 +145,6 @@ describe('Testing Auth Routes', function() {
       });
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     after((done) => {
       server.close(() => console.log('server closed after user tests'));
       done();
