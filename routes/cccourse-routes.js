@@ -27,11 +27,18 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
   }
 });
 
+
+
+// STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
 router.get('/cccourses', (req, res, next) => {
-  // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
   CCCourse.find({})
-    .then(courses => res.json(courses))
-    .catch(next);
+   .then(courses => {
+     courses.forEach(function(course) {
+       res.write(course + '\n');
+     });
+     res.end();
+   })
+  .catch(next);
 });
 
 router.get('/cccourses/:id', (req, res, next) => {

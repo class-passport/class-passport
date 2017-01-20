@@ -11,12 +11,12 @@ let userSchema = mongoose.Schema({
   curr_courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'cccourses'}],
   univ_credits: {type: Number},
   univ_classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'uwcourses'}],
-  admin: {type: Boolean, required: true}
+  admin: {type: Boolean}
 });
 
 userSchema.methods.hashPassword = function(password) {
   if(!password) return Promise.reject(createError(400));
-  
+
   return new Promise((resolve, reject) => {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) return reject(err);
