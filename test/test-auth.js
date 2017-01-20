@@ -117,6 +117,15 @@ describe('testing GET /login route', function(){
     });
   });
 
+  it('should return 401 if user is not authenticated', function(done){
+    request.get('localhost:3000/login')
+    .auth('exampleStudent', '4321')
+    .end((err, res) => {
+      expect(res.status).to.equal(401);
+      done();
+    });
+  });
+
 
 
 
