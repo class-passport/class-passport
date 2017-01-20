@@ -10,7 +10,7 @@ let userSchema = mongoose.Schema({
   password: {type: String, required: true},
   curr_courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'cccourses'}],
   univ_credits: {type: Number},
-  univ_classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'uwcourses'}],
+  univ_classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'ucourses'}],
   admin: {type: Boolean}
 });
 

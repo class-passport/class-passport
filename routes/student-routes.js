@@ -25,30 +25,32 @@ router.get('/students', bearerAuth, (req, res, next) => {
 });
 
 router.get('/students/cccourses', bearerAuth, (req, res, next) => {
-  //THIS IS UNTESTED IN ANY WAY AS OF 1/18/2017
+  //Returns the courses a student is taking
   if(!req.user) return next(createError(401));
   User.findById(req.user._id)
-    .populate('curr_courses')
-    .exec(function(err, courseList) {
-      if (err) {
-        console.log(err);
-        console.log('FIRST ERR');
-        return next(createError(401));
-      }
-      courseList.forEach(function(course) {
-        res.write(course);
-      });
-      res.end('great success');
-    })
-    .catch(function(err) {
-      if(err) {
-        console.log('SECOND ERR');
-        console.log(err);
-        return next(createError(401));
-      }
-    });
+  .populate('curr_courses')
+  .exec(function(err, list) {
+    res.json(list.curr_courses);
+  })
+  .catch(next);
 });
 
+//what I want to do
+//look at a student's cccourses
+//check the UW equivalent
+//return equivalent courses
+//return uw credits that the student would earn.
+
+//jacob is stuck at the moment
+router.get('/students/classcompare', bearerAuth, (req, res, next) => {
+  if(!req.user) return next(createError(401));
+  User.findById(req.user._id)
+  .populate('curr_courses uwequiv')
+  .exec(function(err, list) {
+      console.log(list.curr_courses);
+    });
+    res.end();
+  });
 
 router.put('/students', bearerAuth, (req, res, next) => {
   if(!req.user) return next(createError(401));
