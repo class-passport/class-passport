@@ -82,9 +82,73 @@ describe('Testing Auth Routes', function() {
     });
   });
 
-  after((done) => {
-    server.close(() => console.log('server closed after user tests'));
-    done();
+  describe('testing GET /login route', function(){
+
+    before(done => {
+      let user = new User(exampleStudent);
+      user.hashPassword(exampleStudent.password)
+        .then(user => user.save())
+        .then(user => {
+          this.tempUser = user;
+          done();
+        })
+        .catch(done);
+    });
+
+    after(done => {
+      User.remove({})
+        .then(() => done())
+        .catch(done);
+    });
+
+    it('should return a token', function(done){
+      request.get('localhost:3000/login')
+        .auth('exampleStudent', '1234')
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.be.a('string');
+          done();
+        });
+    });
+
+    it('should return 401 if user is not authenticated', function(done){
+      request.get('localhost:3000/login')
+      .auth('exampleStudent', '4321')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return 401 if user is not in the database', function(done){
+      request.get('localhost:3000/login')
+      .auth('wrongStudent', '1234')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return 400 if no credentials provided', function(){
+      request.get('localhost:3000/login')
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+      });
+    });
+
+    it('should return 404 for unregistered route', function(done){
+      request.get('localhost:3000/log')
+      .send()
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
+
+    after((done) => {
+      server.close(() => console.log('server closed after user tests'));
+      done();
+    });
   });
 
 });

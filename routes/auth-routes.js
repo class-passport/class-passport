@@ -4,6 +4,7 @@
 const Router = require('express').Router;
 const basicAuth = require('../lib/basic-auth-middleware.js');
 const User = require('../models/user.js');
+const createError = require('http-errors');
 
 // module constants
 const router = module.exports = new Router();
@@ -20,7 +21,10 @@ router.post('/signup', (req, res, next) => {
 
 router.get('/login', basicAuth, (req, res, next) => {
   User.findOne({username: req.auth.username})
-    .then(user => user.comparePasswords(req.auth.password))
+    .then(user => {
+      if(!user) return next(createError(401));
+      return user.comparePasswords(req.auth.password);
+    })
     .then(user => user.generateToken())
     .then(token => res.json(token))
     .catch(next); //defaults internal server error if auth is incorrect
