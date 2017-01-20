@@ -126,6 +126,13 @@ describe('testing GET /login route', function(){
     });
   });
 
+  it('should return 400 if no body provided', function(){
+    request.get('localhost:3000/login')
+    .send()
+    .end((err, res) => {
+      expect(res.status).to.equal(400);
+    });
+  });
 
 
 
