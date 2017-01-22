@@ -44,6 +44,15 @@ describe('Testing Student Routes', () => {
     });
   });
 
+  it('should return an error if an admin is accessing this route', (done) => {
+    request.get('localhost:3000/students')
+    .send(exampleAdmin)
+    .end((err, res) => {
+      expect(res.status).to.equal(401);
+      done();
+    });
+  });
+
 
 
 
