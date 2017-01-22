@@ -4,8 +4,7 @@ let createError = require('http-errors');
 let mongoose = require('mongoose');
 
 let cccourseSchema = mongoose.Schema({
-  code: {type: String, required: true},
-  uwequiv: {type: String, ref:'ucourses'}
+  code: {type: String, required: true}
 });
 
 const CCCourse = module.exports = mongoose.model('cccourses', cccourseSchema);

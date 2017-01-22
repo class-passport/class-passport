@@ -12,11 +12,24 @@ describe('testing cccourse routes', function(){
   let course;
   let badToken = 'adfawr234q2345234';
   let courseID;
+  let admin;
+  let adminToken;
 
   before(function(done) {
     server = app.listen(PORT, () => console.log('started tests from cccourse tests'));
 
     let tmp = new User({username: 'sallyhardesty', password: 'testpass', admin: false});
+    let tmpAdmin = new User({username: 'franklinhardesty', password: 'testpass', admin: true});
+
+    tmpAdmin.save()
+    .then(a => {
+      admin = a;
+      a.generateToken()
+      .then(aT => {
+        adminToken = aT;
+      });
+    });
+
     tmp.save()
     .then(u => {
       student = u;
@@ -25,6 +38,7 @@ describe('testing cccourse routes', function(){
         token = tok;
       });
     });
+
     let cmp = new CC({code: 'Eng 101'});
     cmp.save()
     .then(c => {
@@ -36,6 +50,7 @@ describe('testing cccourse routes', function(){
 
   after(function(done) {
     User.remove({_id:student._id}).exec();
+    User.remove({_id:admin._id}).exec();
     CC.remove({_id:course._id}).exec();
 
     server.close(() => console.log('server closed after cccourse tests'));
@@ -52,11 +67,10 @@ describe('testing cccourse routes', function(){
       });
     });
   });
-
-  // test POST errors/messages
+  //
+  // // test POST errors/messages
   describe('testing POST /cccourses functionality', function(){
 
-    //student adds a new course to their personal course list
     it('should add a new course to a studen\'s personal course list', function(done){
       request.post('localhost:3000/cccourses')
       .set('Authorization', 'Bearer ' + token)
@@ -69,7 +83,17 @@ describe('testing cccourse routes', function(){
       });
     });
 
-    //prevent a student from adding a course to the cc
+    it('should allow an admin to add a new course to the CC DB', function(done){
+      request.post('localhost:3000/cccourses')
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
+      .send({code: 'Fish: Are they really trying to take all our women? 204'})
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+    });
+
     it('should not allow a student to add a course to the Community College', function(done){
       request.post('localhost:3000/cccourses')
       .set('Authorization', 'Bearer ' + token)
@@ -81,7 +105,6 @@ describe('testing cccourse routes', function(){
       });
     });
 
-    //prevent a student from adding a course that is not offered by the cc
     it('should not allow a student to add a course that is not offered by the Community College', function(done){
       request.post('localhost:3000/cccourses')
       .set('Authorization', 'Bearer ' + token)
@@ -129,13 +152,12 @@ describe('testing cccourse routes', function(){
       request.get('localhost:3000/cccourses')
       .end((err, res) => {
         expect(res.status).to.equal(200);
-        expect(res.body.length).to.equal(1);
+        expect(res.text).to.contain('Eng 101');
         done();
       });
     });
 
     it('should return a specifc course offered by the CC for an unauthenticated user', function(done){
-      console.log(courseID);
       request.get('localhost:3000/cccourses/' + courseID)
       .end((err, res) => {
         expect(res.status).to.equal(200);
@@ -148,75 +170,63 @@ describe('testing cccourse routes', function(){
   // testing PUT errors/messages
   describe('testing PUT /cccourses functionality', function(){
 
-    it('allows a student to update an existing course within their course list', function(done){
-      request.put('localhost:3000/cccourses/' + courseID)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Accept', 'application/json')
-      .send({course: 'Making Shoes for Hogs 202'})
-      .end((err, res) => {
-        expect(res.status).to.equal(401);
-        done();
-      });
-    });
-
-    //prevent a student from updating a CC course
-    // it('should return a 401 error if a token was not provided', function(done){
-    //   request.post('localhost:3000/student/cccourse')
-    //   .auth('Bearer', token, {type: 'auto'})
-    //   // .send({username: 'usertestafa', password:'testpass'})
-    //   .send({code: 'Making Shoes for Hogs 202'})
+    // it('does not allow a student to update an existing course within their course list', function(done){
+    //   request.put('localhost:3000/cccourses/' + courseID)
+    //   .set('Authorization', 'Bearer ' + token)
+    //   .set('Accept', 'application/json')
+    //   .send({course: 'Making Shoes for Hogs 202'})
     //   .end((err, res) => {
-    //     expect(res.status).to.equal(400); //this will depend on what is written in the routes.
+    //     expect(res.status).to.equal(401);
     //     done();
     //   });
     // });
 
-    //prevent a student from updating another student's courses
-    // it('should prevent a student from updating another student\'s courses', function(){
-    //   request.post('localhost:3000/student/cccourse')
-    //   .auth('Bearer')
-    //
-    //     //THIS WILL HAVE TO WAIT UNTIL EVERYTHING ELSE IS DONE BUT BASICALLY WE'RE GOING TO LET BOB LOG IN AS BOB AND THEN HAVE HIM CHANGE SOMETHING...OR TRY TO TO CHANGE SALLY'S COURSES (LIKE SAY WE WANT TO UPDATE RECORD ID 6), THEN ENSURE THAT NOT ONLY DID HE FAIL, BUT RECORD ID 6 IS THE SAME AS IT WAS BEFORE.
-    // });
+    //admin can update
+    it('will allow an admin to update an existing course within the CC course list', function(done) {
+      console.log('adtok', adminToken);
+      console.log('id', courseID);
+      request.put('localhost:3000/cccourses/' + courseID)
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
+      .send({code: 'How to sniff garbage and detect notes of lavender'})
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        console.log('resbody', res.body);
+        expect(res.body.code).to.equal('How to sniff garbage and detect notes of lavender');
+        done();
+      });
+    });
 
+    // it('will prevent a student from updating a course within the CC course list', function(done){
+    //   request.put('localhost:3000/cccourses/' + courseID)
+    //   .set('Authorization', 'Bearer ' + token)
+    //   .set('Accept', 'application/json')
+    //   .send({course: 'Making Shoes for Hogs 202'})
+    //   .end((err, res) => {
+    //     expect(res.status).to.equal(401);
+    //     done();
+    //   });
+    // });
   });
 
   // testing DELETE errors/messages
-  // describe('testing DELETE /students functionality', function(){
+  describe('testing DELETE /students functionality', function(){
   //
-  //   //allow a student to delete a course from their course listing
-  //   it('should allow a student to delete a course from their course listing', function(){
-  //     request.delete('localhost:3000/cccourses/:id')
-  //     .auth('Bearer', token, {type:'auto'})
-  //     student.deleteOne(course)
-  //     .end((err, res) => {
-  //       if (err) return (err);
-  //       expect(res.body.curr_courses).to.not.contain(course);
-  //     });
-  //   });
-  //
-  //   //allow a student to delete their own profile
-  //   it('should return a 401 error if a token was not provided', function(){
-  //     request.get('localhost:3000/users')
-  //     .auth('Bearer', '', {type:'auto'})
-  //     .send({make: 'usertestafa', model:'testpass'})
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(401);
-  //       // done();
-  //     });
-  //   });
-  //
-  //   // prevent a student from deleting another student
-  //   it('should return a 404 error if the id provided was not found', function(){
-  //     request.get('localhost:3000/users')
-  //     .auth('Bearer', 'badToken', {type: 'auto'})
-  //     .send({make: 'usertestafa', model:'testpass'})
-  //     .end((err, res) =>{
-  //       expect(res.status).to.equal(404);
-  //     });
-  //   });
-  //
-  //   //prevent a student from deleting a cc course
-  // });
+    it('should allow a student to delete a course from their course listing', function(){
+      request.delete('localhost:3000/cccourses/' + courseID)
+      .set('Authorization', 'Bearer ' + token)
+      .end((err, res) => {
+        if (err) return (err);
+        expect(res.body.code).to.not.contain(courseID);
+      });
+    });
+    it('should allow an admin to delete a course from the cc course listing', function(){
+      request.delete('localhost:3000/cccourses/' + courseID)
+      .set('Authorization', 'Bearer ' + adminToken)
+      .end((err, res) => {
+        expect(res.body.code).to.not.contain(courseID);
+      });
+    });
+  });
 
 });
