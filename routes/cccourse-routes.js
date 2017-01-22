@@ -12,8 +12,6 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const router = module.exports = new Router();
 
 router.post('/cccourses', bearerAuth, (req, res, next) => {
-  if(!req.user) return next(createError(401));
-
   // ADMIN FUNCTIONALITY: Creates New Course
   if(req.user.admin) {
     const course = new CCCourse(req.body);
@@ -27,9 +25,6 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
   }
 });
 
-
-
-// STUDENT, ADMIN, UNAUTHENTICATED: Same functionality
 router.get('/cccourses', (req, res, next) => {
   // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality, pulling back all courses offered by the CC
   CCCourse.find({})
@@ -55,8 +50,8 @@ router.get('/cccourses/:id', (req, res, next) => {
 
 router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
   if(!req.user.admin) return next(createError(401));
-
   // STUDENT: Not authorized
+
   // ADMIN: Only admin is permitted to update a course
   CCCourse.findByIdAndUpdate(req.params.id, req.body, {new:true})
     .then(course => res.json(course))
@@ -64,19 +59,16 @@ router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
 });
 
 router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
-  if(!req.student) return next(createError(401));
+  if(req.user.admin) {
+    //ADMIN: Removes a course from collection
+    CCCourse.findByIdAndRemove(req.params.id)
+      .then(() => res.status(204).end())
+      .catch(next);
 
+    return;
+  }
   //STUDENT FUNCTIONALITY: Removes course from curr_courses
   req.student.removeCurrCourse(req.params.id)
     .then(student => res.json(student))
     .catch(next);
-
-  //ADMIN: Removes a course from collection
-  // CCCourse.findByIdAndRemove(req.params.id)
-  //   .then(() => res.status(204).end())
-  //   .catch(next);
-
-  router.get('/*', (req, res, next) => {
-  next(createError(404));
-});
 });

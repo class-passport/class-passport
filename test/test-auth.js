@@ -19,21 +19,22 @@ const exampleAdmin = {
   admin: true
 };
 
-describe('Testing Auth Routes', function() {
+describe('Testing Auth Routes', () => {
   let server;
 
-  before((done) => {
-    server = app.listen(PORT, () => console.log('started tests from user tests'));
+  before(done => {
+    server = app.listen(PORT, () => console.log('started server from auth tests'));
     done();
   });
 
-  describe('testing POST /signup routes', function() {
-    after((done) => {
-      User.remove({}).exec();
-      done();
+  describe('testing POST /signup routes', () => {
+    after(done => {
+      User.remove({})
+        .then(() => done())
+        .catch(done);
     });
 
-    it('should return 200 and token on student signup', (done) => {
+    it('should return 200 and token on student signup', done => {
       request.post('localhost:3000/signup')
       .send(exampleStudent)
       .end((err, res) => {
@@ -43,7 +44,7 @@ describe('Testing Auth Routes', function() {
       });
     });
 
-    it('should return 200 and token on admin signup', (done) => {
+    it('should return 200 and token on admin signup', done => {
       request.post('localhost:3000/signup')
       .send(exampleAdmin)
       .end((err, res) => {
@@ -53,7 +54,7 @@ describe('Testing Auth Routes', function() {
       });
     });
 
-    it('should return 400 with no body provided', (done) => {
+    it('should return 400 with no body provided', done => {
       request.post('localhost:3000/signup')
       .send()
       .end((err, res) => {
@@ -62,7 +63,7 @@ describe('Testing Auth Routes', function() {
       });
     });
 
-    it('should return 400 with invalid body provided', (done) => {
+    it('should return 400 with invalid body provided', done => {
       request.post('localhost:3000/signup')
       .send('Invalid Body')
       .end((err, res) => {
@@ -71,7 +72,7 @@ describe('Testing Auth Routes', function() {
       });
     });
 
-    it('should return 409 if username is already in database', (done) => {
+    it('should return 409 if username is already in database', done => {
       request.post('localhost:3000/signup')
       .send(exampleStudent)
       .end((err, res) => {
@@ -82,7 +83,7 @@ describe('Testing Auth Routes', function() {
     });
   });
 
-  describe('testing GET /login route', function(){
+  describe('testing GET /login route', () => {
 
     before(done => {
       let user = new User(exampleStudent);
@@ -101,7 +102,7 @@ describe('Testing Auth Routes', function() {
         .catch(done);
     });
 
-    it('should return a token', function(done){
+    it('should return a token to user with correct username and password', done => {
       request.get('localhost:3000/login')
         .auth('exampleStudent', '1234')
         .end((err, res) => {
@@ -111,7 +112,7 @@ describe('Testing Auth Routes', function() {
         });
     });
 
-    it('should return 401 if user is not authenticated', function(done){
+    it('should return 401 if user provides incorrect password', done => {
       request.get('localhost:3000/login')
       .auth('exampleStudent', '4321')
       .end((err, res) => {
@@ -120,7 +121,7 @@ describe('Testing Auth Routes', function() {
       });
     });
 
-    it('should return 401 if user is not in the database', function(done){
+    it('should return 401 if user is not in the database', done => {
       request.get('localhost:3000/login')
       .auth('wrongStudent', '1234')
       .end((err, res) => {
@@ -129,24 +130,16 @@ describe('Testing Auth Routes', function() {
       });
     });
 
-    it('should return 400 if no credentials provided', function(){
+    it('should return 400 if no credentials provided', done => {
       request.get('localhost:3000/login')
       .end((err, res) => {
         expect(res.status).to.equal(400);
-      });
-    });
-
-    it('should return 404 for unregistered route', function(done){
-      request.get('localhost:3000/log')
-      .send()
-      .end((err, res) => {
-        expect(res.status).to.equal(404);
         done();
       });
     });
 
-    after((done) => {
-      server.close(() => console.log('server closed after user tests'));
+    after(done => {
+      server.close(() => console.log('server closed after auth tests'));
       done();
     });
   });
