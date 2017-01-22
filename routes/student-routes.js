@@ -3,6 +3,7 @@
 // npm modules
 const createError = require('http-errors');
 const Router = require('express').Router;
+const UWcourse = require('../models/uwcourse');
 
 // app modules
 const User = require('../models/user.js');
@@ -35,21 +36,36 @@ router.get('/students/cccourses', bearerAuth, (req, res, next) => {
   .catch(next);
 });
 
-//what I want to do
-//look at a student's cccourses
-//check the UW equivalent
-//return equivalent courses
-//return uw credits that the student would earn.
 
-//jacob is stuck at the moment
+//this will look different, will likely use reduce to add credits
+// let generateUwCredits = function(objectArray) {
+//   return new Promise ((resolve, reject) => {
+//     if(!objectArray) return reject(createError(400));
+//     objectArray.map(function(a) {
+//       resolve(a.credits);
+//     });
+//   });
+// };
+
+//compares a student's community college classes and checks the uw course list to see if the there is an equivalent, then prints off the info of the uw equivalents that it finds. 
 router.get('/students/classcompare', bearerAuth, (req, res, next) => {
+  let uwCourseEquivalents = [];
   if(!req.user) return next(createError(401));
   User.findById(req.user._id)
-  .populate('curr_courses uwequiv')
+  .populate('curr_courses')
   .exec(function(err, list) {
-    console.log(list.curr_courses);
+    let studentCourseList = list.curr_courses;
+    list.generateCourseList(studentCourseList)
+    .then(courses => {
+      courses.forEach(function(course) {
+        uwCourseEquivalents.push(UWcourse.find({ccequiv: course}));
+      });
+      Promise.all(uwCourseEquivalents)
+      .then(list => {
+        res.json(list);
+      });
+    });
   });
-  res.end();
 });
 
 router.put('/students', bearerAuth, (req, res, next) => {
