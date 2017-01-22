@@ -56,4 +56,16 @@ userSchema.methods.removeCurrCourse = function(courseId) {
     .then(user => user);
 };
 
+//HELPER FUNCTION FOR GENERATING ARRAY OF COURSE CODES
+userSchema.methods.generateCourseList = function(objectArray) {
+  return new Promise ((resolve, reject) => {
+    if(!objectArray) return reject(createError(400));
+    let courseCodeArr = objectArray.map(function(a) {
+      return a.code;
+    });
+    resolve(courseCodeArr);
+  });
+};
+
+
 module.exports = mongoose.model('users', userSchema);
