@@ -20,6 +20,7 @@ describe('testing cccourse routes', function(){
 
     let tmp = new User({username: 'sallyhardesty', password: 'testpass', admin: false});
     let tmpAdmin = new User({username: 'franklinhardesty', password: 'testpass', admin: true});
+
     tmpAdmin.save()
     .then(a => {
       admin = a;
@@ -28,6 +29,7 @@ describe('testing cccourse routes', function(){
         adminToken = aT;
       });
     });
+
     tmp.save()
     .then(u => {
       student = u;
@@ -36,6 +38,7 @@ describe('testing cccourse routes', function(){
         token = tok;
       });
     });
+
     let cmp = new CC({code: 'Eng 101'});
     cmp.save()
     .then(c => {
@@ -76,6 +79,17 @@ describe('testing cccourse routes', function(){
       .end((err, res) => {
         expect(res.status).to.equal(200);
         expect(res.body.curr_courses.length).to.equal(1);
+        done();
+      });
+    });
+
+    it('should allow an admin to add a new course to the CC DB', function(done){
+      request.post('localhost:3000/cccourses')
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
+      .send({code: 'Fish: Are they really trying to take all our women? 204'})
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
         done();
       });
     });
@@ -156,27 +170,43 @@ describe('testing cccourse routes', function(){
   // testing PUT errors/messages
   describe('testing PUT /cccourses functionality', function(){
 
-    it('does not allow a student to update an existing course within their course list', function(done){
+    // it('does not allow a student to update an existing course within their course list', function(done){
+    //   request.put('localhost:3000/cccourses/' + courseID)
+    //   .set('Authorization', 'Bearer ' + token)
+    //   .set('Accept', 'application/json')
+    //   .send({course: 'Making Shoes for Hogs 202'})
+    //   .end((err, res) => {
+    //     expect(res.status).to.equal(401);
+    //     done();
+    //   });
+    // });
+
+    //admin can update
+    it('will allow an admin to update an existing course within the CC course list', function(done) {
+      console.log('adtok', adminToken);
+      console.log('id', courseID);
       request.put('localhost:3000/cccourses/' + courseID)
-      .set('Authorization', 'Bearer ' + token)
+      .set('Authorization', 'Bearer ' + adminToken)
       .set('Accept', 'application/json')
-      .send({course: 'Making Shoes for Hogs 202'})
+      .send({code: 'How to sniff garbage and detect notes of lavender'})
       .end((err, res) => {
-        expect(res.status).to.equal(401);
+        expect(res.status).to.equal(200);
+        console.log('resbody', res.body);
+        expect(res.body.code).to.equal('How to sniff garbage and detect notes of lavender');
         done();
       });
     });
 
-    it('will prevent a student from updating a course within the CC course list', function(done){
-      request.put('localhost:3000/cccourses/' + courseID)
-      .set('Authorization', 'Bearer ' + token)
-      .set('Accept', 'application/json')
-      .send({course: 'Making Shoes for Hogs 202'})
-      .end((err, res) => {
-        expect(res.status).to.equal(401);
-        done();
-      });
-    });
+    // it('will prevent a student from updating a course within the CC course list', function(done){
+    //   request.put('localhost:3000/cccourses/' + courseID)
+    //   .set('Authorization', 'Bearer ' + token)
+    //   .set('Accept', 'application/json')
+    //   .send({course: 'Making Shoes for Hogs 202'})
+    //   .end((err, res) => {
+    //     expect(res.status).to.equal(401);
+    //     done();
+    //   });
+    // });
   });
 
   // testing DELETE errors/messages
