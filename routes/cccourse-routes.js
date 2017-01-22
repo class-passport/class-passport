@@ -41,7 +41,6 @@ router.get('/cccourses/:id', (req, res, next) => {
   // STUDENT, ADMIN, UNAUTHENTICATED: Same functionality, pulling back a single course offered by the CC
   CCCourse.findById(req.params.id)
     .then(course => {
-      console.log('coursething', course);
       res.json(course);
 
     })
@@ -50,6 +49,7 @@ router.get('/cccourses/:id', (req, res, next) => {
 
 router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
   if(!req.user.admin) return next(createError(401));
+  console.log('user', req.user);
   // STUDENT: Not authorized
 
   // ADMIN: Only admin is permitted to update a course
