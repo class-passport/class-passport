@@ -47,10 +47,10 @@ router.get('/students/classcompare', bearerAuth, (req, res, next) => {
   User.findById(req.user._id)
   .populate('curr_courses uwequiv')
   .exec(function(err, list) {
-      console.log(list.curr_courses);
-    });
-    res.end();
+    console.log(list.curr_courses);
   });
+  res.end();
+});
 
 router.put('/students', bearerAuth, (req, res, next) => {
   if(!req.user) return next(createError(401));
