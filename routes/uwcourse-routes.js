@@ -7,7 +7,7 @@ const Router = require('express').Router;
 const router = module.exports = new Router();
 
 //Post a new UW course if the user is an admin. Tested manually and seems to work.
-router.post('/uwcourse', bearerAuth, (req, res, next) => {
+router.post('/uwcourses', bearerAuth, (req, res, next) => {
   if(!req.user) return next(createError(401));
   if(req.user.admin) {
     const course = new Course(req.body);
@@ -24,29 +24,23 @@ router.get('/uwcourse', (req, res) => {
   Course.find({}).then(courses => res.json(courses));
 });
 
-  // router.put('/users', bearerAuth, (req, res) => {
-  //   if(req.user.admin) {
-  //     User.update((req.body), function(err){
-  //       if(err) {
-  //         res.status(400).end('bad request');
-  //       } else {
-  //         res.status(200).json({msg: 'updated the user'})
-  //       }
-  //     });
-  //   } else{
-  //     if(err) {
-  //       console.log(err);
-  //       res.status(404).end('not found');
-  //     }
-  //   }
-  // });
-  //
-  // router.delete('/users', bearerAuth, (req, res) => {
-  //   if(req.user) {
-  //     delete req.user
-  //     .then( () => res.status(204).send())
-  //     .catch(err => createError(404, 'Not Found'));
-  //   } else {
-  //     res.json({msg: 'you are not authorized to delete'})
-  //   }
-  // });
+router.put('/uwcourses/:id', bearerAuth, (req, res, next) => {
+  if(!req.user.admin) return next(createError(401));
+  // STUDENT: Not authorized
+
+  // ADMIN: Only admin is permitted to update a course
+  Course.findByIdAndUpdate(req.params.id, req.body, {new:true})
+    .then(course => res.json(course))
+    .catch(next);
+});
+
+router.delete('/uwcourses/:id', bearerAuth, function(req, res, next) {
+  if(!req.user.admin) return next(createError(401));
+  // STUDENT: Not authorized
+
+    //ADMIN: Removes a course from collection
+  Course.findByIdAndRemove(req.params.id)
+    .then(() => res.status(204).end())
+    .catch(next);
+  return;
+});
