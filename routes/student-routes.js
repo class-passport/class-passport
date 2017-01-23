@@ -47,8 +47,8 @@ router.get('/students/cccourses', bearerAuth, (req, res, next) => {
 //   });
 // };
 
-//compares a student's community college classes and checks the uw course list to see if the there is an equivalent, then prints off the info of the uw equivalents that it finds. 
-router.get('/students/classcompare', bearerAuth, (req, res, next) => {
+//compares a student's community college classes and checks the uw course list to see if the there is an equivalent, then prints off the info of the uw equivalents that it finds.
+router.get('/students/university-equiv', bearerAuth, (req, res, next) => {
   let uwCourseEquivalents = [];
   if(!req.user) return next(createError(401));
   User.findById(req.user._id)
@@ -64,6 +64,29 @@ router.get('/students/classcompare', bearerAuth, (req, res, next) => {
       .then(list => {
         res.json(list);
       });
+    });
+  });
+});
+
+//if you want to push your UW course equivalents to the student
+router.post('/students/university-equiv', bearerAuth, (req, res, next) => {
+  if(!req.user) return next(createError(401));
+  User.findById(req.user._id)
+  .populate('curr_courses')
+  .exec(function(err, user) {
+    let promises = user.curr_courses.map(course => {
+      return UWcourse.findOne({ccequiv: course.code});
+    });
+    Promise.all(promises)
+      .then(uwCourses => {
+        uwCourses.forEach((uwCourse, index) => {
+          user.curr_courses[index].uwequiv = uwCourse;
+          if(uwCourse) {
+            req.user.univ_classes.push(uwCourse);
+          }
+      });
+      req.user.save();
+      res.json(user);
     });
   });
 });
