@@ -143,24 +143,25 @@ describe('testing student routes', function(){
     //     .catch(done);
     // });
 
-    // it('should not allow an unauth user to hit this route', (done) => {
-    //   request.delete('localhost:3000/students')
-    //   .set('Authorization', 'Bearer' + badToken)
-    //   .set('Accept', 'application/json')
-    //   .end((err, res) => {
-    //     expect(res.status).to.equal(401);
-    //     done();
-    //   });
-    // });
-
-    it('should allow a student to delete their profile', () => {
+    it('should not allow an admin user to hit this route', (done) => {
       request.delete('localhost:3000/students')
-      .set('Authorization', 'Bearer ' + token)
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
       .end((err, res) => {
-        expect(res.status).to.equal(4);
+        expect(res.status).to.equal(401);
+        done();
       });
     });
 
+    it('should allow a student to delete their profile', (done) => {
+      request.delete('localhost:3000/students')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(204);
+        done();
+      });
+    });
 
 
   });
