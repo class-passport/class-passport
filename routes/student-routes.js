@@ -47,69 +47,24 @@ router.get('/students/cccourses', bearerAuth, (req, res, next) => {
 //   });
 // };
 
-
-//this should work in place of the map at the bottom of the next function.... but it doesn't. and I give up.
-// let showEquivalents = function(objectArray) {
-//   return new Promise((resolve, reject) => {
-//     if(!objectArray) return reject(createError(401));
-//     let abbrevCourseList = objectArray.map(function(course) {
-//       if(course) {
-//         return({cccourse: course.ccequiv, uwequiv: course.code});
-//       }
-//     });
-//     resolve(abbrevCourseList);
-//   });
-// };
-
-router.get('/students/university-equiv', bearerAuth, (req, res, next) => {
+//compares a student's community college classes and checks the uw course list to see if the there is an equivalent, then prints off the info of the uw equivalents that it finds.
+router.get('/students/classcompare', bearerAuth, (req, res, next) => {
   let uwCourseEquivalents = [];
   if(!req.user) return next(createError(401));
   User.findById(req.user._id)
   .populate('curr_courses')
   .exec(function(err, list) {
     let studentCourseList = list.curr_courses;
-    //helper function makes an maps an array of only cccourse codes
     list.generateCourseList(studentCourseList)
     .then(courses => {
-      //find the uw equivalents to the cc course codes and push them to temp array
       courses.forEach(function(course) {
-        uwCourseEquivalents.push(UWcourse.findOne({ccequiv: course}));
+        uwCourseEquivalents.push(UWcourse.find({ccequiv: course}));
       });
       Promise.all(uwCourseEquivalents)
       .then(list => {
-        let newList = list.map(function(course) {
-          //tried to make this into a promise but was not successful
-          if(course) return ({cccourse: course.ccequiv, uwequiv: course.code});
-        });
-        res.json(newList); //gives direct list of cccourses and their uw equivalents
+        res.json(list);
       });
     });
-  })
-  .catch(next);
-});
-
-//if you want to push your UW course equivalents to the student
-router.post('/students/university-equiv', bearerAuth, (req, res, next) => {
-  if(!req.user) return next(createError(401));
-  User.findById(req.user._id)
-  .populate('curr_courses')
-  .exec(function(err, user) {
-    //creates new array of uw course equivalents to the user's cc courses
-    let promises = user.curr_courses.map(course => {
-      return UWcourse.findOne({ccequiv: course.code});
-    });
-    Promise.all(promises)
-      .then(uwCourses => {
-        //this list has too much detail! code below pares it down and pushes IDs to user profile where they will persist.
-        uwCourses.forEach((uwCourse, index) => {
-          user.curr_courses[index].uwequiv = uwCourse;
-          if(uwCourse) {
-            req.user.univ_classes.push(uwCourse);
-          }
-        });
-        req.user.save();
-        res.json(user);
-      });
   });
 });
 
@@ -126,10 +81,8 @@ router.put('/students', bearerAuth, (req, res, next) => {
 });
 
 router.delete('/students', bearerAuth, (req, res, next) => {
-  if(!req.user) return next(createError(401));
-  if (!req.user.admin === false) {
-    User.findByIdAndRemove(req.user._id)
-    .then(() => res.status(204).end())
-    .catch(next);
-  }
+  if(req.user.admin) return next(createError(401));
+  User.findByIdAndRemove(req.user._id)
+  .then(() => res.status(204).end())
+  .catch(next);
 });
