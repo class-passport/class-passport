@@ -12,6 +12,7 @@ const errorMiddlware = require('./lib/error-middleware.js');
 const authRoutes = require('./routes/auth-routes.js');
 const studentRoutes = require('./routes/student-routes.js');
 const ccCourseRoutes = require('./routes/cccourse-routes.js');
+// const uwRoutes = require('./routes/uw-routes.js');
 const uwCourseRoutes = require('./routes/uwcourse-routes.js');
 const mongo = require('./secrets/secrets');
 
@@ -28,6 +29,7 @@ app.use(jsonParser);
 app.use(authRoutes);
 app.use(studentRoutes);
 app.use(ccCourseRoutes);
+// app.use(uwRoutes);
 app.use(uwCourseRoutes);
 app.use(errorMiddlware);
 
