@@ -48,7 +48,7 @@ describe('testing student routes', function(){
         token = tokenS;
       });
     });
-    let tempCourse = new CC({code: 'Eng 101'});
+    let tempCourse = new CC({code: 'PoliSci 101'});
     tempCourse.save()
     .then(c => {
       courseID = c._id;
@@ -123,11 +123,22 @@ describe('testing student routes', function(){
     });
   });
 
-  it('should get courses from student personal course list', function(done){
+  it('should get courses from student personal course list', (done) => {
     request.get('localhost:3000/students/cccourses')
     .set('Authorization', 'Bearer ' + token)
     .set('Accept', 'application/json')
-    .send({code: 'Eng 101'})
+    .send({code: 'PoliSci 101'})
+    .end((err, res) => {
+      expect(res.status).to.equal(200);
+      done();
+    });
+  });
+
+  it('should get courses from an admin personal course list', (done) => {
+    request.get('localhost:3000/students/cccourses')
+    .set('Authorization', 'Bearer ' + adminToken)
+    .set('Accept', 'application/json')
+    .send({code: 'PoliSci 101'})
     .end((err, res) => {
       expect(res.status).to.equal(200);
       done();
