@@ -9,7 +9,6 @@ let userSchema = mongoose.Schema({
   username: {type: String, required: true, unique: true},
   password: {type: String, required: true},
   curr_courses: [{type: mongoose.Schema.Types.ObjectId, ref: 'cccourses'}],
-  univ_credits: {type: Number},
   univ_classes: [{type: mongoose.Schema.Types.ObjectId, ref: 'ucourses'}],
   admin: {type: Boolean}
 });
@@ -87,7 +86,11 @@ userSchema.methods.showCourseCredits = function(objectArray) {
         return({cccourse: course.ccequiv, uw_credits: course.credits});
       }
     });
-    resolve(abbrevCourseList);
+    let creditsResult = {
+      courses: abbrevCourseList,
+      total_uw_credits: objectArray.reduce((a, b) => a.credits + b.credits)
+    };
+    resolve(creditsResult);
   });
 };
 
