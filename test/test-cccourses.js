@@ -4,6 +4,7 @@ let app = require('../index.js');
 let User = require('../models/user');
 let CC = require('../models/cccourse');
 let PORT = process.env.PORT || 3000;
+let mongoose = require('mongoose');
 
 describe('testing cccourse routes', function(){
   let server;
@@ -49,12 +50,33 @@ describe('testing cccourse routes', function(){
   });
 
   after(function(done) {
-    User.remove({_id:student._id}).exec();
-    User.remove({_id:admin._id}).exec();
+
+
+   User.remove({})
+     .then(() => sever.close(() => {
+       console.log('sever closed after cccourse tests');
+       done();
+     }));
+
+    User.remove({})
+      .then(() =>  User.remove({id:admin_id}))
+      .then(())
+
+    User.remove({_id:student._id}).exec(function() {
+      done()
+    });
+    User.remove({_id:admin._id}).exec()
+    .then( );
     CC.remove({_id:course._id}).exec();
 
     server.close(() => console.log('server closed after cccourse tests'));
     done();
+    /*
+    mongoose.connection.db.dropDatabase(err => {
+      console.log(err);
+      console.ll
+    })
+    */
   });
 
   //Unregistered route
