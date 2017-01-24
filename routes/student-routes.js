@@ -13,32 +13,33 @@ const bearerAuth = require('../lib/bearer-auth-middleware.js');
 const router = module.exports = new Router();
 
 router.get('/students', bearerAuth, (req, res, next) => {
-  if(!req.user) return next(createError(401));
-  if(!req.user.admin) {
-    User.findById(req.user._id)
-    .then(user => {
-      delete user.password;
-      res.json(user);
-    })
-    .catch(next);
-  }
-  else return next(createError(401));
+  if(req.user.admin) return next(createError(401));
+
+  User.findById(req.user._id)
+  .then(user => {
+    user.password = null;
+    res.json(user);
+  })
+  .catch(next);
 });
 
 router.get('/students/cccourses', bearerAuth, (req, res, next) => {
+  if(req.user.admin) return next(createError(401));
+
   //Returns the courses a student is taking
-  if(!req.user) return next(createError(401));
   User.findById(req.user._id)
   .populate('curr_courses')
   .exec(function(err, list) {
-    res.json(list.curr_courses);
+    res.json({currCourses: list.curr_courses});
   })
   .catch(next);
 });
 
 router.get('/students/university-equiv/credits', bearerAuth, (req, res, next) => {
+  if(req.user.admin) return next(createError(401));
+
   let uwCourseEquivalents = [];
-  if(!req.user) return next(createError(401));
+
   User.findById(req.user._id)
   .populate('curr_courses')
   .exec(function(err, list) {
@@ -65,8 +66,10 @@ router.get('/students/university-equiv/credits', bearerAuth, (req, res, next) =>
 });
 
 router.get('/students/university-equiv', bearerAuth, (req, res, next) => {
+  if(req.user.admin) return next(createError(401));
+
   let uwCourseEquivalents = [];
-  if(!req.user) return next(createError(401));
+
   User.findById(req.user._id)
   .populate('curr_courses')
   .exec(function(err, list) {
@@ -92,7 +95,8 @@ router.get('/students/university-equiv', bearerAuth, (req, res, next) => {
 
 //if you want to push your UW course equivalents to the student
 router.post('/students/university-equiv', bearerAuth, (req, res, next) => {
-  if(!req.user) return next(createError(401));
+  if(req.user.admin) return next(createError(401));
+
   User.findById(req.user._id)
   .populate('curr_courses')
   .exec(function(err, user) {
@@ -116,19 +120,21 @@ router.post('/students/university-equiv', bearerAuth, (req, res, next) => {
 });
 
 router.put('/students', bearerAuth, (req, res, next) => {
-  if(!req.user) return next(createError(401));
-  if (!req.user.admin === false) {
-    User.findOneAndUpdate({_id: req.user._id}, req.body, {new: true})
-    .then(user => {
-      delete user.password;
-      res.json(user);
-    })
-    .catch(next);
-  }
+  if(req.user.admin) return next(createError(401));
+
+  if(req.body.hasOwnProperty('admin') || req.body.hasOwnProperty('curr_courses') || req.body.hasOwnProperty('univ_classes')) return next(createError(400, 'some of these properties are not able to be updated'));
+
+  User.findOneAndUpdate({_id: req.user._id}, req.body, {new: true})
+  .then(user => {
+    user.password = null;
+    res.json(user);
+  })
+  .catch(next);
 });
 
 router.delete('/students', bearerAuth, (req, res, next) => {
   if(req.user.admin) return next(createError(401));
+
   User.findByIdAndRemove(req.user._id)
   .then(() => res.status(204).end())
   .catch(next);
