@@ -117,7 +117,7 @@ describe('testing student routes', function(){
   //
   // });
   //
-  // it('should return courses currently in the student\'s curr_courses array', (done) => {
+  // it('should return courses currently in the student curr_courses array', (done) => {
   //
   // })
   //
@@ -125,23 +125,13 @@ describe('testing student routes', function(){
   //
   // })
   //
-  // it('should return courses currently in the admin\'s curr_courses array', (done) => {
+  // it('should return courses currently in the admin curr_courses array', (done) => {
   //
   // })
 
 
   describe('testing DELETE /students route', () => {
 
-    // before(done => {
-    //   let user = new User(student);
-    //   user.hashPassword(student.password)
-    //     .then(user => user.save())
-    //     .then(user => {
-    //       this.tempUser = user;
-    //       done();
-    //     })
-    //     .catch(done);
-    // });
 
     it('should not allow an admin user to hit this route', (done) => {
       request.delete('localhost:3000/students')
@@ -164,7 +154,31 @@ describe('testing student routes', function(){
     });
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   });
+
 
 
 
