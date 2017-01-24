@@ -5,7 +5,7 @@ let User = require('../models/user');
 let UW = require('../models/uwcourse');
 let PORT = process.env.PORT || 3000;
 
-describe.only('testing uwcourse routes', function(){
+describe('testing uwcourse routes', function(){
   let server;
   let student;
   let token;
@@ -26,7 +26,6 @@ describe.only('testing uwcourse routes', function(){
     .then(w => {
       uwCourseID = w._id;
       uwCourse = w;
-      console.log(uwCourseID);
     });
 
     tmp.save()
@@ -51,10 +50,9 @@ describe.only('testing uwcourse routes', function(){
   });
 
   after(function(done) {
-    console.log('uwCourse', uwCourse);
     User.remove({_id:student._id}).exec();
     User.remove({_id:admin._id}).exec();
-    // UW.remove({_id:uwCourse._id}).exec();
+    UW.remove({_id:uwCourse._id}).exec();
 
     server.close(() => console.log('server closed after uwcourse tests'));
     done();
@@ -62,21 +60,21 @@ describe.only('testing uwcourse routes', function(){
 
 
   //Unregistered route
-  // describe('testing unregistered route', function(){
-  //   it('should return 404 for an unregistered route', function(done) {
-  //     request.get('http://localhost:3000/stuff')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(404);
-  //       done();
-  //     });
-  //   });
-  // });
+  describe('testing unregistered route', function(){
+    it('should return 404 for an unregistered route', function(done) {
+      request.get('http://localhost:3000/stuff')
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
+  });
 
 
   // test POST errors/messages
   describe('testing POST /uwcourse functionality', function(){
     it('should allow an admin to add a new course to the UW DB', function(done){
-      request.post('localhost:3000/uwcourse')
+      request.post('localhost:3000/uwcourses')
       .set('Authorization', 'Bearer ' + adminToken)
       .set('Accept', 'application/json')
       .send({code: 'Fish: Are they really trying to take all our women? 205', credits: 5})
@@ -87,8 +85,7 @@ describe.only('testing uwcourse routes', function(){
     });
 
     it('should not allow a student to add a course to the UW DB', function(done){
-      console.log('tok', token);
-      request.post('localhost:3000/uwcourse')
+      request.post('localhost:3000/uwcourses')
       .set('Authorization', 'Bearer ' + token)
       .set('Accept', 'application/json')
       .send({code: 'Marmot Shaving 105'})
@@ -103,49 +100,59 @@ describe.only('testing uwcourse routes', function(){
 // test GET functionality
   describe('testing GET /uwcourse functionality', function(){
     it('should return all courses offered by UW for an unauthenticated user', function(done){
-      request.get('localhost:3000/uwcourse')
+      request.get('localhost:3000/uwcourses')
       .end((err, res) => {
         expect(res.status).to.equal(200);
         expect(res.text).to.contain('Fish: Are they really trying to take all our women? 200');
         done();
       });
     });
-    it('should return a specific course offered by UW when given an id', function(done){
-      console.log(uwCourseID);
-      request.get('localhost:3000/uwcourse/' + uwCourseID)
+  });
+
+  // // test PUT functionality
+  describe('testing PUT /uwcourse functionality', function(){
+    it('will allow an admin to update an existing course within the UW course list', function(done) {
+      request.put('localhost:3000/uwcourses/' + uwCourseID)
+       .set('Authorization', 'Bearer ' + adminToken)
+       .set('Accept', 'application/json')
+       .send({code: 'How to sniff garbage and detect notes of lavender', credits: 50})
+       .end((err, res) => {
+         expect(res.status).to.equal(200);
+         expect(res.body.code).to.equal('How to sniff garbage and detect notes of lavender');
+         done();
+       });
+    });
+
+    it('will prevent a student from updating a course within the UW course list', function(done){
+      request.put('localhost:3000/uwcourses/' + uwCourseID)
+       .set('Authorization', 'Bearer ' + token)
+       .set('Accept', 'application/json')
+       .send({course: 'Making Shoes for Hogs 202'})
+       .end((err, res) => {
+         expect(res.status).to.equal(401);
+         done();
+       });
+    });
+  });
+  //   // test DELETE functionality
+  describe('testing DELETE /uwcourse functionality', function(){
+    it('should allow an admin to delete a course from the UW course listing', function(done){
+      request.delete('localhost:3000/uwcourses/' + uwCourseID)
+      .set('Authorization', 'Bearer ' + adminToken)
       .end((err, res) => {
-        console.log('res', res);
-        // expect(res.status).to.equal(200);
-        // console.log('body', res.body);
-        // expect(res.body.code).to.equal('Fish: Are they really trying to take all our women? 200');
+        expect(res.status).to.equal(204);
+        done();
+      });
+    });
+    it('should not allow a student to delete a course from the UW course listing', function(done) {
+      request.delete('localhost:3000/uwcourses/' + uwCourseID)
+      .set('Authoriziation', 'Bearer ' + token)
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
         done();
       });
     });
   });
-
-  // // test PUT functionality
-  //   describe('testing PUT /uwcourse functionality', function(){
-  //     it('should ', function(done){
-  //       //things
-  //       done();
-  //     });
-  //     it('should ', function(done){
-  //       //things
-  //       done();
-  //     });
-  //   });
-  //
-  //   // test DELETE functionality
-  //     describe('testing DELETE /uwcourse functionality', function(){
-  //       it('should ', function(done){
-  //         //things
-  //         done();
-  //       });
-  //       it('should ', function(done){
-  //         //things
-  //         done();
-  //       });
-  //     });
 
 
 
