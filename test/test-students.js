@@ -59,7 +59,7 @@ describe('testing student routes', function(){
   //Unregistered route
   describe('testing unregistered route', () => {
     it('should return 404 for an unregistered route', (done) => {
-      request.get('localhost:3000/cats')
+      request.get('http://localhost:3000/cats')
       .end((err, res) => {
         expect(res.status).to.equal(404);
         done();
