@@ -56,63 +56,63 @@ describe('testing student routes', function(){
     done();
   });
 
-  // //Unregistered route
-  // describe('testing unregistered route', () => {
-  //   it('should return 404 for an unregistered route', (done) => {
-  //     request.get('localhost:3000/cats')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(404);
-  //       done();
-  //     });
-  //   });
-  // });
-  //
-  // describe('testing GET /students route', () => {
-  //
-  //   it('should allow a student to access /students route', (done) => {
-  //     request.get('localhost:3000/students')
-  //     .set('Authorization', 'Bearer ' + token)
-  //     .set('Accept', 'application/json')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(200);
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should not allow an admin to access /students route', function(done){
-  //     request.get('localhost:3000/students')
-  //     .set('Authorization', 'Bearer ' + adminToken)
-  //     .set('Accept', 'application/json')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(401);
-  //       done();
-  //     });
-  //   });
-  //
-  //   it('should return 401 when unauth user attemps to access the route', (done) => {
-  //     request.get('localhost:3000/students')
-  //     .set('Authorization', 'Bearer' + badToken)
-  //     .set('Accept', 'application/json')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(401);
-  //       done();
-  //     });
-  //   });
-  // });
-  //
-  // describe('testing GET /students/cccourses route', () => {
-  //
-  //   it('should return 401 when an unauth user hits the route', (done) => {
-  //     request.get('localhost:3000/students/cccourses')
-  //     .set('Authorization', 'Bearer' + badToken)
-  //     .set('Accept', 'application/json')
-  //     .end((err, res) => {
-  //       expect(res.status).to.equal(401);
-  //       done();
-  //     });
-  //   });
-  // });
-  //
+  //Unregistered route
+  describe('testing unregistered route', () => {
+    it('should return 404 for an unregistered route', (done) => {
+      request.get('localhost:3000/cats')
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
+  });
+
+  describe('testing GET /students route', () => {
+
+    it('should allow a student to access /students route', (done) => {
+      request.get('localhost:3000/students')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+    });
+
+    it('should not allow an admin to access /students route', function(done){
+      request.get('localhost:3000/students')
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return 401 when unauth user attemps to access the route', (done) => {
+      request.get('localhost:3000/students')
+      .set('Authorization', 'Bearer' + badToken)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+  });
+
+  describe('testing GET /students/cccourses route', () => {
+
+    it('should return 401 when an unauth user hits the route', (done) => {
+      request.get('localhost:3000/students/cccourses')
+      .set('Authorization', 'Bearer' + badToken)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+  });
+
   // it('should allow a student to access the /students/cccourses route', (done) => {
   //
   // });
@@ -132,16 +132,16 @@ describe('testing student routes', function(){
 
   describe('testing DELETE /students route', () => {
 
-    before(done => {
-      let user = new User(student);
-      user.hashPassword(student.password)
-        .then(user => user.save())
-        .then(user => {
-          this.tempUser = user;
-          done();
-        })
-        .catch(done);
-    });
+    // before(done => {
+    //   let user = new User(student);
+    //   user.hashPassword(student.password)
+    //     .then(user => user.save())
+    //     .then(user => {
+    //       this.tempUser = user;
+    //       done();
+    //     })
+    //     .catch(done);
+    // });
 
     // it('should not allow an unauth user to hit this route', (done) => {
     //   request.delete('localhost:3000/students')
