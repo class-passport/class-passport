@@ -4,6 +4,7 @@ let request = require('superagent');
 let expect = require('chai').expect;
 let app = require('../index.js');
 let User = require('../models/user');
+let UW = require('../models/uwcourse');
 let CC = require('../models/cccourse');
 let PORT = process.env.PORT || 3000;
 
@@ -16,12 +17,21 @@ describe('testing student routes', function(){
   let courseID;
   let admin;
   let adminToken;
+  let uwCourseID;
+  let uwCourse;
 
   before(function(done) {
     server = app.listen(PORT, () => console.log('started student tests'));
 
     let tempStudent = new User({username: 'mars', password: '1234', admin: false});
     let tempAdmin = new User({username: 'perry', password: '4321', admin: true});
+    let uwtmp = new UW({code: 'Fish: Are they really trying to take all our women? 200', credits: 5});
+
+    uwtmp.save()
+      .then(w => {
+        uwCourseID = w._id;
+        uwCourse = w;
+      });
     tempAdmin.save()
     .then(userAdmin => {
       admin = userAdmin;
@@ -48,9 +58,9 @@ describe('testing student routes', function(){
   });
 
   after(function(done) {
-    User.remove({_id:student._id}).exec();
-    User.remove({_id:admin._id}).exec();
-    CC.remove({_id:course._id}).exec();
+    User.remove({_id: student._id}).exec();
+    User.remove({_id: admin._id}).exec();
+    CC.remove({_id: course._id}).exec();
 
     server.close(() => console.log('server closed after student tests'));
     done();
@@ -59,7 +69,7 @@ describe('testing student routes', function(){
   //Unregistered route
   describe('testing unregistered route', () => {
     it('should return 404 for an unregistered route', (done) => {
-      request.get('http://localhost:3000/cats')
+      request.get('localhost:3000/cats')
       .end((err, res) => {
         expect(res.status).to.equal(404);
         done();
@@ -113,25 +123,21 @@ describe('testing student routes', function(){
     });
   });
 
-  // it('should allow a student to access the /students/cccourses route', (done) => {
-  //
-  // });
-  //
-  // it('should return courses currently in the student curr_courses array', (done) => {
-  //
-  // })
-  //
-  // it('should allow an admin to access the /students/cccourses route', (done) => {
-  //
-  // })
-  //
-  // it('should return courses currently in the admin curr_courses array', (done) => {
-  //
-  // })
+  it('should get courses from student personal course list', function(done){
+    request.get('localhost:3000/students/cccourses')
+    .set('Authorization', 'Bearer ' + token)
+    .set('Accept', 'application/json')
+    .send({code: 'Eng 101'})
+    .end((err, res) => {
+      expect(res.status).to.equal(200);
+      done();
+    });
+  });
+
+
 
 
   describe('testing DELETE /students route', () => {
-
 
     it('should not allow an admin user to hit this route', (done) => {
       request.delete('localhost:3000/students')
@@ -154,31 +160,7 @@ describe('testing student routes', function(){
     });
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   });
-
 
 
 
