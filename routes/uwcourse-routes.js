@@ -20,7 +20,7 @@ router.post('/uwcourses', bearerAuth, (req, res, next) => {
 });
 
 //Get all UW courses, no authentication needed
-router.get('/uwcourse', (req, res) => {
+router.get('/uwcourses', (req, res) => {
   Course.find({}).then(courses => res.json(courses));
 });
 
