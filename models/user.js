@@ -61,9 +61,33 @@ userSchema.methods.generateCourseList = function(objectArray) {
   return new Promise ((resolve, reject) => {
     if(!objectArray) return reject(createError(400));
     let courseCodeArr = objectArray.map(function(a) {
-      return a.code;
+      return ({code: a.code, equiv: a.uwequiv});
     });
     resolve(courseCodeArr);
+  });
+};
+
+userSchema.methods.showCourseEquivalents = function(objectArray) {
+  return new Promise((resolve, reject) => {
+    if(!objectArray) return reject(createError(401));
+    let abbrevCourseList = objectArray.map(function(course) {
+      if(course) {
+        return({cccourse: course.ccequiv, uwequiv: course.code});
+      }
+    });
+    resolve(abbrevCourseList);
+  });
+};
+
+userSchema.methods.showCourseCredits = function(objectArray) {
+  return new Promise((resolve, reject) => {
+    if(!objectArray) return reject(createError(401));
+    let abbrevCourseList = objectArray.map(function(course) {
+      if(course) {
+        return({cccourse: course.ccequiv, uw_credits: course.credits});
+      }
+    });
+    resolve(abbrevCourseList);
   });
 };
 

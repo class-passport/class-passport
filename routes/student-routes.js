@@ -36,30 +36,33 @@ router.get('/students/cccourses', bearerAuth, (req, res, next) => {
   .catch(next);
 });
 
-
-//this will look different, will likely use reduce to add credits
-// let generateUwCredits = function(objectArray) {
-//   return new Promise ((resolve, reject) => {
-//     if(!objectArray) return reject(createError(400));
-//     objectArray.map(function(a) {
-//       resolve(a.credits);
-//     });
-//   });
-// };
-
-
-//this should work in place of the map at the bottom of the next function.... but it doesn't. and I give up.
-// let showEquivalents = function(objectArray) {
-//   return new Promise((resolve, reject) => {
-//     if(!objectArray) return reject(createError(401));
-//     let abbrevCourseList = objectArray.map(function(course) {
-//       if(course) {
-//         return({cccourse: course.ccequiv, uwequiv: course.code});
-//       }
-//     });
-//     resolve(abbrevCourseList);
-//   });
-// };
+router.get('/students/university-equiv/credits', bearerAuth, (req, res, next) => {
+  let uwCourseEquivalents = [];
+  if(!req.user) return next(createError(401));
+  User.findById(req.user._id)
+  .populate('curr_courses')
+  .exec(function(err, list) {
+    let studentCourseList = list.curr_courses;
+    //helper function makes an maps an array of only cccourse codes
+    list.generateCourseList(studentCourseList)
+    .then(courses => {
+      //find the uw equivalents to the cc course codes and push them to temp array
+      courses.forEach(function(course) {
+        if(course.equiv){
+          uwCourseEquivalents.push(UWcourse.findOne({ccequiv: course.code}));
+        }
+      });
+      Promise.all(uwCourseEquivalents)
+      .then(list => {
+        req.user.showCourseCredits(list)
+        .then(results => {
+          res.json(results);
+        });
+      });
+    });
+  })
+  .catch(next);
+});
 
 router.get('/students/university-equiv', bearerAuth, (req, res, next) => {
   let uwCourseEquivalents = [];
@@ -73,15 +76,14 @@ router.get('/students/university-equiv', bearerAuth, (req, res, next) => {
     .then(courses => {
       //find the uw equivalents to the cc course codes and push them to temp array
       courses.forEach(function(course) {
-        uwCourseEquivalents.push(UWcourse.findOne({ccequiv: course}));
+        uwCourseEquivalents.push(UWcourse.findOne({ccequiv: course.code}));
       });
       Promise.all(uwCourseEquivalents)
       .then(list => {
-        let newList = list.map(function(course) {
-          //tried to make this into a promise but was not successful
-          if(course) return ({cccourse: course.ccequiv, uwequiv: course.code});
+        req.user.showCourseEquivalents(list)
+        .then(results => {
+          res.json(results);
         });
-        res.json(newList); //gives direct list of cccourses and their uw equivalents
       });
     });
   })
