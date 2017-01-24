@@ -18,7 +18,7 @@ describe('testing student routes', function(){
   let adminToken;
 
   before(function(done) {
-    server = app.listen(PORT, () => console.log('started tests from cccourse tests'));
+    server = app.listen(PORT, () => console.log('started student tests'));
 
     let tempStudent = new User({username: 'mars', password: '1234', admin: false});
     let tempAdmin = new User({username: 'perry', password: '4321', admin: true});
@@ -52,7 +52,7 @@ describe('testing student routes', function(){
     User.remove({_id:admin._id}).exec();
     CC.remove({_id:course._id}).exec();
 
-    server.close(() => console.log('server closed after cccourse tests'));
+    server.close(() => console.log('server closed after student tests'));
     done();
   });
 
@@ -66,7 +66,7 @@ describe('testing student routes', function(){
       });
     });
   });
-  //
+
   describe('testing GET /students route', () => {
 
     it('should allow a student to access /students route', (done) => {
@@ -113,6 +113,45 @@ describe('testing student routes', function(){
     });
   });
 
+  // it('should allow a student to access the /students/cccourses route', (done) => {
+  //
+  // });
+  //
+  // it('should return courses currently in the student curr_courses array', (done) => {
+  //
+  // })
+  //
+  // it('should allow an admin to access the /students/cccourses route', (done) => {
+  //
+  // })
+  //
+  // it('should return courses currently in the admin curr_courses array', (done) => {
+  //
+  // })
+
+
+  describe('testing DELETE /students route', () => {
+
+
+    it('should not allow an admin user to hit this route', (done) => {
+      request.delete('localhost:3000/students')
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should allow a student to delete their profile', (done) => {
+      request.delete('localhost:3000/students')
+      .set('Authorization', 'Bearer ' + token)
+      .set('Accept', 'application/json')
+      .end((err, res) => {
+        expect(res.status).to.equal(204);
+        done();
+      });
+    });
 
 
 
@@ -130,6 +169,15 @@ describe('testing student routes', function(){
 
 
 
+
+
+
+
+
+
+
+
+  });
 
 
 
