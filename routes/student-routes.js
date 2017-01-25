@@ -43,18 +43,22 @@ router.get('/students/university-equiv/credits', bearerAuth, (req, res, next) =>
   User.findById(req.user._id)
   .populate('curr_courses')
   .exec(function(err, list) {
+    console.log('THIS IS OUR LIST', list.curr_courses);
     let studentCourseList = list.curr_courses;
     //helper function makes an maps an array of only cccourse codes
     list.generateCourseList(studentCourseList)
     .then(courses => {
+      console.log('STEP 2 ALL COURSES', courses);
       //find the uw equivalents to the cc course codes and push them to temp array
       courses.forEach(function(course) {
+        console.log('STEP 3 IN OUR FOR EACH', course.code);
         if(course.equiv){
           uwCourseEquivalents.push(UWcourse.findOne({ccequiv: course.code}));
         }
       });
       Promise.all(uwCourseEquivalents)
       .then(list => {
+        console.log('STEP 4', list);
         req.user.showCourseCredits(list)
         .then(results => {
           res.json(results);
