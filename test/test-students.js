@@ -48,32 +48,26 @@ describe('testing student routes', function() {
     new UWCourse(exampleUW).save()
       .then(uwcourse => {
         this.tempUWCourse = uwcourse;
+        return CCCourse(exampleCC).save();
       })
-      .catch(done);
-
-    new CCCourse(exampleCC).save()
       .then(cccourse => {
         this.tempCCCourse = cccourse;
         this.tempCCCourse.uwequiv = this.tempUWCourse._id;
-        console.log('THIS IS TEMP CCCCCOURSE', this.tempCCCourse);
+        this.tempUWCourse.ccequiv = this.tempCCCourse._id;
+        return this.tempCCCourse.save();
       })
-      .catch(done);
-
-
-
-
-
-    new User(exampleStudent).save()
+      .then(() => this.tempUWCourse.save())
+      .then(() => new User(exampleStudent).save())
       .then(student => {
         this.tempStudent = student;
-        return this.tempStudent.generateToken();
+        this.tempStudent.curr_courses.push(this.tempCCCourse._id);
+        return this.tempStudent.save();
       })
+      .then(student => student.generateToken())
       .then(token => {
         this.tempStudent.token = token;
+        return new User(exampleAdmin).save();
       })
-      .catch(done);
-
-    new User(exampleAdmin).save()
       .then(admin => {
         this.tempAdmin = admin;
         return this.tempAdmin.generateToken();
@@ -159,7 +153,9 @@ describe('testing student routes', function() {
       .set('Authorization', 'Bearer ' + this.tempStudent.token)
       .end((err, res) => {
         expect(res.status).to.equal(200);
-        expect(res.body.currCourses).to.deep.equal([]); //NEED TO ADD A COURSE IN THE BEFORE BLOCK
+        console.log('LOGGING CC COURSE AGAN', this.tempCCCourse);
+        expect(res.body.currCourses[0].code).to.equal('MATH 151');
+        // expect(res.body.currCourses[0]._id).to.deep.equal(this.tempCCCourse._id); // can we get this to work? ObjectId problem, I think?
         done();
       });
     });
@@ -176,14 +172,32 @@ describe('testing student routes', function() {
 
   describe('testing GET /students/university-equiv/credits routes', () => {
 
-    it('should return 404 for a student with empty curr_courses array', done => {
+    it('should return 200 for a student with non-empty curr_courses array', done => {
+      console.log('THIS IS OUR FULL STUDENT', this.tempStudent);
+      console.log('OUR FULL CC COURSE', this.tempCCCourse);
+      console.log('OUR FULL UW COURSE', this.tempUWCourse);
       request.get('localhost:3000/students/university-equiv/credits')
       .set('Authorization', 'Bearer ' + this.tempStudent.token)
       .end((err, res) => {
-        expect(res.status).to.equal(404);
+        console.log('THE BODY YO',res.body);
+        expect(res.status).to.equal(200);
+        expect(res.body.courses.length).to.equal(1);
+        expect(res.body.courses[0].cccourse).to.equal('MATH 151');
+        expect(res.body.courses[0].uw_credits).to.equal(5);
         done();
       });
     });
+
+    // it('should return 404 for a student with empty curr_courses array', done => {
+    //   request.get('localhost:3000/students/university-equiv/credits')
+    //   .set('Authorization', 'Bearer ' + this.tempStudent.token)
+    //   .end((err, res) => {
+    //     console.log('LOL', res.body);
+    //     console.log('the ccourse', this.tempCCCourse);
+    //     expect(res.status).to.equal(904);
+    //     done();
+    //   });
+    // });
 
     it('should return 200 for a student with non-empty curr_courses', done => {
       request.get('localhost:3000/students/university-equiv/credits')
@@ -273,7 +287,7 @@ describe('testing student routes', function() {
         expect(res.body.password).to.not.exist;
         expect(res.body.admin).to.equal.false;
         expect(res.body.univ_classes).to.deep.equal([]);
-        expect(res.body.curr_courses).to.deep.equal([]);
+        expect(res.body.curr_courses.length).to.equal(1);
         done();
       });
     });
