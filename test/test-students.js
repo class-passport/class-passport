@@ -27,6 +27,8 @@ describe('testing student routes', function() {
   let server;
 
   before(done => {
+    User.remove({}).exec();
+
     server = app.listen(PORT, () => console.log('started server from student tests'));
 
     new User(exampleStudent).save()
