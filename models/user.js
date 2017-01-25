@@ -66,6 +66,7 @@ userSchema.methods.generateCourseList = function(objectArray) {
   });
 };
 
+//Generates new object array of community college courses and their uw equivalents
 userSchema.methods.showCourseEquivalents = function(objectArray) {
   return new Promise((resolve, reject) => {
     if(!objectArray) return reject(createError(401));
@@ -78,6 +79,7 @@ userSchema.methods.showCourseEquivalents = function(objectArray) {
   });
 };
 
+//generates new object array of community college courses and the uw credit value to each course
 userSchema.methods.showCourseCredits = function(objectArray) {
   return new Promise((resolve, reject) => {
     if(!objectArray) return reject(createError(401));
@@ -86,6 +88,7 @@ userSchema.methods.showCourseCredits = function(objectArray) {
         return({cccourse: course.ccequiv, uw_credits: course.credits});
       }
     });
+    //creates new object that includes total uw credits student could receive for current classes
     let creditsResult = {
       courses: abbrevCourseList,
       total_uw_credits: objectArray.reduce((a, b) => a.credits + b.credits)
@@ -94,14 +97,15 @@ userSchema.methods.showCourseCredits = function(objectArray) {
   });
 };
 
-userSchema.methods.generateCourseIds = function(objectArray) {
-  return new Promise ((resolve, reject) => {
-    if(!objectArray) return reject(createError(400));
-    let courseCodeArr = objectArray.map(function(a) {
-      return a._id;
-    });
-    resolve(courseCodeArr);
-  });
-};
+//haven't used the method below yet. 
+// userSchema.methods.generateCourseIds = function(objectArray) {
+//   return new Promise ((resolve, reject) => {
+//     if(!objectArray) return reject(createError(400));
+//     let courseCodeArr = objectArray.map(function(a) {
+//       return a._id;
+//     });
+//     resolve(courseCodeArr);
+//   });
+// };
 
 module.exports = mongoose.model('users', userSchema);
