@@ -16,6 +16,9 @@ describe('testing uwcourse routes', function(){
   let adminToken;
 
   before(function(done) {
+    User.remove({}).exec()
+        .then(UW.remove({}).exec());
+
     server = app.listen(PORT, () => console.log('started tests from uwcourse tests'));
 
     let tmpAdmin = new User({username: 'franklinhardesty', password: 'testpass', admin: true});
@@ -50,10 +53,6 @@ describe('testing uwcourse routes', function(){
   });
 
   after(function(done) {
-    User.remove({_id:student._id}).exec();
-    User.remove({_id:admin._id}).exec();
-    UW.remove({_id:uwCourse._id}).exec();
-
     server.close(() => console.log('server closed after uwcourse tests'));
     done();
   });
@@ -94,9 +93,38 @@ describe('testing uwcourse routes', function(){
         done();
       });
     });
+
+    it('should return a 500 error if an invalid token is provided for an admin', function(done){
+      request.post('localhost:3000/uwcourses')
+      .set('Authorization', 'Bearer ' + badToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(500);
+        done();
+      });
+    });
+
+    it('should return a 401 if no token provided', function(done){
+      request.post('localhost:3000/uwcourses')
+      .set('Authorization', 'Bearer ', '')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return a 400 error if no body is provided in the POST request', function(done){
+      request.post('localhost:3000/uwcourses')
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
+      .send()
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+    });
   });
-
-
+//
+//
 // test GET functionality
   describe('testing GET /uwcourse functionality', function(){
     it('should return all courses offered by UW for an unauthenticated user', function(done){
@@ -133,8 +161,39 @@ describe('testing uwcourse routes', function(){
          done();
        });
     });
+
+    it('should return a 500 error if an invalid token is provided for an admin', function(done){
+      request.post('localhost:3000/uwcourses')
+      .set('Authorization', 'Bearer ' + badToken)
+      .end((err, res) => {
+        expect(res.status).to.equal(500);
+        done();
+      });
+    });
+
+    it('should return a 401 if no token provided', function(done){
+      request.post('localhost:3000/uwcourses')
+      .set('Authorization', 'Bearer ', '')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return a 400 error if no body is provided in the POST request', function(done){
+      request.post('localhost:3000/cccourses')
+      .set('Authorization', 'Bearer ' + adminToken)
+      .set('Accept', 'application/json')
+      .send()
+      .end((err, res) => {
+        expect(res.status).to.equal(400);
+        done();
+      });
+    });
   });
-  //   // test DELETE functionality
+
+
+  // test DELETE functionality
   describe('testing DELETE /uwcourse functionality', function(){
     it('should allow an admin to delete a course from the UW course listing', function(done){
       request.delete('localhost:3000/uwcourses/' + uwCourseID)
@@ -153,9 +212,5 @@ describe('testing uwcourse routes', function(){
       });
     });
   });
-
-
-
-
-  //end of file
+//end of file
 });

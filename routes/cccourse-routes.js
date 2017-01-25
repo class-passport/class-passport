@@ -68,7 +68,7 @@ router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
     return;
   }
   //STUDENT FUNCTIONALITY: Removes course from curr_courses
-  req.student.removeCurrCourse(req.params.id)
+  req.user.removeCurrCourse(req.params.id)
     .then(student => res.json(student))
     .catch(next);
 });
