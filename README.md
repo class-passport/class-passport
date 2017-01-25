@@ -12,7 +12,7 @@ An app that helps users easily plan transferring from a Community College to a U
 3. Begin planning your future!
 
 ##Schema
-  - <Jacob's awesome schema diagram goes here>
+![model750x580](https://cloud.githubusercontent.com/assets/13214336/22278630/de5f056e-e279-11e6-9818-1877aba883f4.png)
 
 ## Routes
 ### Signup/Login (auth-routes)
@@ -21,7 +21,7 @@ An app that helps users easily plan transferring from a Community College to a U
     - You should receive a success return as well as a unique token.
 
 
-##Authors
+##Contributors
     Jessica Vasquez-Soltero
     Johnathan Daniels
     Jacob Isenberg
