@@ -7,6 +7,8 @@ let expect = require('chai').expect;
 // app modules
 let app = require('../index.js');
 let User = require('../models/user.js');
+let UWCourse = require('../models/uwcourse.js');
+let CCCourse = require('../models/cccourse.js');
 
 // module constants
 let PORT = process.env.PORT || 3000;
@@ -23,6 +25,18 @@ let exampleAdmin = {
   admin: true
 };
 
+let exampleUW = {
+  code: 'MATH 124',
+  longTitle: 'MATH FOR LOSERS',
+  description: 'Great fun',
+  ccequiv: 'MATH 151',
+  credits: 5
+};
+
+let exampleCC = {
+  code: 'MATH 151'
+};
+
 describe('testing student routes', function() {
   let server;
 
@@ -30,6 +44,24 @@ describe('testing student routes', function() {
     User.remove({}).exec();
 
     server = app.listen(PORT, () => console.log('started server from student tests'));
+
+    new UWCourse(exampleUW).save()
+      .then(uwcourse => {
+        this.tempUWCourse = uwcourse;
+      })
+      .catch(done);
+
+    new CCCourse(exampleCC).save()
+      .then(cccourse => {
+        this.tempCCCourse = cccourse;
+        this.tempCCCourse.uwequiv = this.tempUWCourse._id;
+        console.log('THIS IS TEMP CCCCCOURSE', this.tempCCCourse);
+      })
+      .catch(done);
+
+
+
+
 
     new User(exampleStudent).save()
       .then(student => {
@@ -153,14 +185,14 @@ describe('testing student routes', function() {
       });
     });
 
-    // it('should return 200 for a student with non-empty curr_courses', done => {
-    //   request.get('localhost:3000/students/university-equiv/credits')
-    //   .set('Authorization', 'Bearer ' + this.tempStudent.token)
-    //   .end((err, res) => {
-    //     expect(res.status).to.equal(401);
-    //     done();
-    //   });
-    // });
+    it('should return 200 for a student with non-empty curr_courses', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+    });
 
     it('should return 401 for an admin', done => {
       request.get('localhost:3000/students/university-equiv/credits')
