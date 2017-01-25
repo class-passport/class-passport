@@ -80,7 +80,7 @@ userSchema.methods.showCourseEquivalents = function(objectArray) {
 
 userSchema.methods.showCourseCredits = function(objectArray) {
   return new Promise((resolve, reject) => {
-    if(!objectArray) return reject(createError(401));
+    if(!objectArray.length) return reject(createError(404, 'student does not have any current courses'));
     let abbrevCourseList = objectArray.map(function(course) {
       if(course) {
         return({cccourse: course.ccequiv, uw_credits: course.credits});

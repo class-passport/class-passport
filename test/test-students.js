@@ -140,6 +140,93 @@ describe('testing student routes', function() {
     });
   });
 
+  describe('testing GET /students/university-equiv/credits routes', () => {
+
+    it('should return 404 for a student with empty curr_courses array', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(404);
+        done();
+      });
+    });
+
+    // it('should return 200 for a student with non-empty curr_courses', done => {
+    //   request.get('localhost:3000/students/university-equiv/credits')
+    //   .set('Authorization', 'Bearer ' + this.tempStudent.token)
+    //   .end((err, res) => {
+    //     expect(res.status).to.equal(401);
+    //     done();
+    //   });
+    // });
+
+    it('should return 401 for an admin', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .set('Authorization', 'Bearer ' + this.tempAdmin.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return 401 for an unauthenticated user', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+  });
+
+
+  // router.get('/students/university-equiv/credits', bearerAuth, (req, res, next) => {
+  //   if(req.user.admin) return next(createError(401));
+  //
+  //   let uwCourseEquivalents = [];
+  //
+  //   User.findById(req.user._id)
+  //   .populate('curr_courses')
+  //   .exec(function(err, list) {
+  //     let studentCourseList = list.curr_courses;
+  //     //helper function makes an maps an array of only cccourse codes
+  //     list.generateCourseList(studentCourseList)
+  //     .then(courses => {
+  //       //find the uw equivalents to the cc course codes and push them to temp array
+  //       courses.forEach(function(course) {
+  //         if(course.equiv){
+  //           uwCourseEquivalents.push(UWcourse.findOne({ccequiv: course.code}));
+  //         }
+  //       });
+  //       Promise.all(uwCourseEquivalents)
+  //       .then(list => {
+  //         req.user.showCourseCredits(list)
+  //         .then(results => {
+  //           res.json(results);
+  //         });
+  //       });
+  //     });
+  //   })
+  //   .catch(next);
+  // });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   describe('testing PUT /students route', () => {
     it('should return 200 for student along with updated profile', done => {
       request.put('localhost:3000/students')

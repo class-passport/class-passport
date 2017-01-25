@@ -58,7 +58,8 @@ router.get('/students/university-equiv/credits', bearerAuth, (req, res, next) =>
         req.user.showCourseCredits(list)
         .then(results => {
           res.json(results);
-        });
+        })
+        .catch(next);
       });
     });
   })

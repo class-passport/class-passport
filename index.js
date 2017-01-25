@@ -24,7 +24,7 @@ mongoose.connect(MONGODB_URI);
 mongoose.Promise = Promise;
 
 // app middleware
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 app.use(jsonParser);
 app.use(authRoutes);
 app.use(studentRoutes);
