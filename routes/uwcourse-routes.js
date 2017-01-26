@@ -7,15 +7,12 @@ const Router = require('express').Router;
 const router = module.exports = new Router();
 
 router.post('/uwcourses', bearerAuth, (req, res, next) => {
-  if(!req.user) return next(createError(401));
-  if(req.user.admin) {
-    const course = new Course(req.body);
-    course.save()
-      .then(course => res.json(course))
-      .catch(next);
-  } else {
-    return next(createError(401));
-  }
+  if(!req.user.admin) return next(createError(401));
+  
+  const course = new Course(req.body);
+  course.save()
+    .then(course => res.json(course))
+    .catch(next);
 });
 
 router.get('/uwcourses', (req, res) => {

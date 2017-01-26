@@ -13,9 +13,6 @@ describe('testing uwcourse routes', function(){
   let adminToken;
 
   before(function(done) {
-    User.remove({}).exec()
-        .then(UW.remove({}).exec());
-
     server = app.listen(PORT, () => console.log('started tests from uwcourse tests'));
 
     let tmpAdmin = new User({username: 'franklinhardesty', password: 'testpass', admin: true});
@@ -47,8 +44,13 @@ describe('testing uwcourse routes', function(){
   });
 
   after(function(done) {
-    server.close(() => console.log('server closed after uwcourse tests'));
-    done();
+    User.remove({})
+    .then(() => UW.remove({}))
+    .then(() => {
+      server.close(() => console.log('server closed after uwcourse tests'));
+      done();
+    })
+    .catch(done);
   });
 
   describe('testing unregistered route', function(){

@@ -41,8 +41,7 @@ describe('testing student routes', function() {
   let server;
 
   before(done => {
-    User.remove({}).exec();
-
+    
     server = app.listen(PORT, () => console.log('started server from student tests'));
 
     new UWCourse(exampleUW).save()
@@ -81,10 +80,13 @@ describe('testing student routes', function() {
 
   after(done => {
     User.remove({})
+    .then(() => CCCourse.remove({}))
+    .then(() => UWCourse.remove({}))
     .then(() => {
       server.close(() => console.log('server closed after student tests'));
       done();
-    });
+    })
+    .catch(done);
   });
 
   describe('testing unregistered route', () => {
@@ -184,11 +186,12 @@ describe('testing student routes', function() {
       request.get('localhost:3000/students/university-equiv/credits')
       .set('Authorization', 'Bearer ' + this.tempStudent.token)
       .end((err, res) => {
+        console.log('THIS IS BODY', res.body);
         expect(res.status).to.equal(200);
         expect(res.body.courses.length).to.equal(1);
         expect(res.body.courses[0].cccourse).to.equal('MATH 151');
         expect(res.body.courses[0].uw_credits).to.equal(5);
-        // expect(res.body.total_uw_credits).to.equal(5); //I think this has something to do with the reduce
+        expect(res.body.total_uw_credits).to.equal(5); //I think this has something to do with the reduce
         done();
       });
     });

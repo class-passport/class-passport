@@ -97,15 +97,4 @@ userSchema.methods.showCourseCredits = function(objectArray) {
   });
 };
 
-//haven't used the method below yet.
-// userSchema.methods.generateCourseIds = function(objectArray) {
-//   return new Promise ((resolve, reject) => {
-//     if(!objectArray) return reject(createError(400));
-//     let courseCodeArr = objectArray.map(function(a) {
-//       return a._id;
-//     });
-//     resolve(courseCodeArr);
-//   });
-// };
-
 module.exports = mongoose.model('users', userSchema);
