@@ -193,17 +193,6 @@ describe('testing student routes', function() {
       });
     });
 
-    // it('should return 400 for a student with empty curr_courses array', done => {
-    //   request.get('localhost:3000/students/university-equiv/credits')
-    //   .set('Authorization', 'Bearer ' + this.tempStudent.token)
-    //   .end((err, res) => {
-    //     console.log('LOL', res.body);
-    //     console.log('the ccourse', this.tempCCCourse);
-    //     expect(res.status).to.equal(400);
-    //     done();
-    //   });
-    // });
-
     it('should return 401 for an admin', done => {
       request.get('localhost:3000/students/university-equiv/credits')
       .set('Authorization', 'Bearer ' + this.tempAdmin.token)

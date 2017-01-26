@@ -26,7 +26,6 @@ router.get('/students', bearerAuth, (req, res, next) => {
 router.get('/students/cccourses', bearerAuth, (req, res, next) => {
   if(req.user.admin) return next(createError(401));
 
-  //Returns the courses a student is taking
   User.findById(req.user._id)
   .populate('curr_courses')
   .exec(function(err, list) {

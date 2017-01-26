@@ -51,7 +51,6 @@ describe('testing cccourse routes', function(){
     done();
   });
 
-  //Unregistered route
   describe('testing unregistered route', function(){
     it('should return 404 for an unregistered route', function(done) {
       request.get('http://localhost:3000/stuff')
@@ -218,7 +217,6 @@ describe('testing cccourse routes', function(){
     });
   });
 
-
   // testing DELETE errors/messages
   describe('testing DELETE /cccourses functionality', function(){
     it('should allow a student to delete a course from their course list', function(done){
@@ -229,6 +227,7 @@ describe('testing cccourse routes', function(){
         done();
       });
     });
+    
     it('should allow an admin to delete a course from the cc course listing', function(done){
       request.delete('localhost:3000/cccourses/' + courseID)
       .set('Authorization', 'Bearer ' + adminToken)
