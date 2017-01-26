@@ -28,6 +28,8 @@ This route will allow both students and administrators to input new courses as w
 
  Students and Admins can, as unauthenticated users on this route, receive a full listing of all available Community College courses.  
 
+ Example Return: ```{ "_id" : ObjectId("58894cb409ecbe1d2700c0f2"), "username" : "franklinhardesty", "password" : "testpass", "admin" : true, "univ_classes" : [ ], "curr_courses" : [ ], "__v" : 0 }```
+
 
 # POST /cccourses
 Students (authenticated)
@@ -54,6 +56,8 @@ Administrators can, while authenticated, only add new courses to the primary Com
 
 - Required fields (in the body):
   - Code (class name) - Must be a string
+
+  Example Return: ```{ "_id" : ObjectId("58894cb309ecbe1d2700c0ef"), "code" : "MATH 151", "__v" : 0, "uwequiv" : ObjectId("58894cb309ecbe1d2700c0ee") }```
 
 
 # PUT /cccourses/:id
@@ -86,6 +90,13 @@ Administrators are allowed, while authenticated, to delete existing courses with
   - Course ID
 
 
+# Error Responses
+- 200 - Everything is OK (You're cool.)
+- 204 - No Content (Delete route worked.)
+- 400 - Bad Request (You did something wrong.)
+- 401 - Not Authorized (You can't go past the velvet rope.)
+- 404 - Not Found (Like my parents when I was 5.  I found them later, when I was 12.)
+- 500 - Internal Server Error (You'd better call someone.)
 
 
 
@@ -95,6 +106,16 @@ Administrators are allowed, while authenticated, to delete existing courses with
 #### POST /signup
   - To sign up, type the following command into your terminal ```curl -i -H "Accept: application/json" -H "Content-Type: application/json" -X POST -d '{"username": "<your unique username>", "password": "<your unique password>", "admin": "<true or false"}' localhost:3000/signup```
     - You should receive a success return as well as a unique token.
+
+
+## Testing
+
+# Testing Framework
+
+- Mocha
+- Chai (Expect)
+- Eslint
+
 
 
 ##Contributors
