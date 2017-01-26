@@ -18,7 +18,7 @@ const mongo = require('./secrets/secrets');
 
 // module constants
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = mongo.URI || 'mongodb://localhost/project';
+const MONGODB_URI = process.env.MONGODB_URI || mongo.URI || 'mongodb://localhost/project';
 
 mongoose.connect(MONGODB_URI);
 mongoose.Promise = Promise;

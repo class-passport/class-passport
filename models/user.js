@@ -91,21 +91,16 @@ userSchema.methods.showCourseCredits = function(objectArray) {
     //creates new object that includes total uw credits student could receive for current classes
     let creditsResult = {
       courses: abbrevCourseList,
-      total_uw_credits: objectArray.reduce((a, b) => a.credits + b.credits)
+      total_uw_credits: function getCredits(array) {
+        if(array.length === 1) {
+          return array.map((a) => a.credits)[0];
+        } else {
+          return array.reduce((a, b) => a.credits + b.credits);
+        }
+      }(objectArray)
     };
     resolve(creditsResult);
   });
 };
-
-//haven't used the method below yet.
-// userSchema.methods.generateCourseIds = function(objectArray) {
-//   return new Promise ((resolve, reject) => {
-//     if(!objectArray) return reject(createError(400));
-//     let courseCodeArr = objectArray.map(function(a) {
-//       return a._id;
-//     });
-//     resolve(courseCodeArr);
-//   });
-// };
 
 module.exports = mongoose.model('users', userSchema);

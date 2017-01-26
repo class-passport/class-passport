@@ -9,8 +9,7 @@ const UWCourse = require('../models/uwcourse.js');
 
 const router = module.exports = new Router();
 router.get('/uwdata/:subject', (req, res, next) => {
-
-  request.get('https://wseval.s.uw.edu:443/student/v5/course.json?year=2017&quarter=winter&curriculum_abbreviation=' + req.params.subject)
+  request.get('https://wseval.s.uw.edu:443/student/v5/course.json?year=2017&quarter=winter&curriculum_abbreviation=' + req.params.subject + '&page_size=5&page_start=6')
     .set('Authorization', 'Bearer ' + process.env.UW_TOKEN)
     .end((err, response) => {
 
