@@ -14,11 +14,11 @@ const studentRoutes = require('./routes/student-routes.js');
 const ccCourseRoutes = require('./routes/cccourse-routes.js');
 const dbRoutes = require('./routes/db-load-routes.js');
 const uwCourseRoutes = require('./routes/uwcourse-routes.js');
-const mongo = require('./secrets/secrets');
+// const mongo = require('./secrets/secrets');
 
 // module constants
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = mongo.URI || 'mongodb://localhost/project';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost/project';
 
 mongoose.connect(MONGODB_URI);
 mongoose.Promise = Promise;
