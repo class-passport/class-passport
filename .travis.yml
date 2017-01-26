@@ -12,8 +12,8 @@ addons:
       - g++-4.8
 env:
   - CXX=g++-4.8
-  - MONGODB_URI=mongodb://localhost/test
-  - PORT=3000
+  # - MONGODB_URI=mongodb://localhost/test
+  # - PORT=3000
 sudo: required
 before_script: npm install
 after_success:
