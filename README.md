@@ -45,17 +45,17 @@ An app that helps users easily plan transferring from a 2 Year Community College
   Authorization: 'Bearer <token>'
   ```
   - Provide username and password in JSON format:
-     ```
+    ```
         {
         "username": "string",
         "password": "string",
         }
-        ```
+    ```
 
    - Example Response(token):
-    ```
+```
    eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU4ODk1ODFmZDA0ZDFhMmIyOWM5NjQyZCIsImlhdCI6MTQ4NTM5NTk5OX0.8_Zijpib85BGwh99IUHlrGjhT59EzigyTp8fssgSE48
-   ```
+ ```
 
 ### Login/Sigunp Error Handling
 - 200 upon successful signup or login
@@ -166,7 +166,7 @@ Administrators are allowed, while authenticated, to delete existing courses with
 - Chai (Expect)
 - Eslint
 
-##Contributors
+## Contributors
     Jessica Vasquez-Soltero
     Jonathan Daniel
     Jacob Isenberg
