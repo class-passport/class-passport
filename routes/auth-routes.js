@@ -22,10 +22,10 @@ router.post('/signup', (req, res, next) => {
 router.get('/login', basicAuth, (req, res, next) => {
   User.findOne({username: req.auth.username})
     .then(user => {
-      if(!user) return next(createError(401));
+      if(!user) return Promise.reject(next(createError(401)));
       return user.comparePasswords(req.auth.password);
     })
     .then(user => user.generateToken())
     .then(token => res.json(token))
-    .catch(next); //defaults internal server error if auth is incorrect
+    .catch(next);
 });

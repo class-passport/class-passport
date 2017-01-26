@@ -58,7 +58,8 @@ router.get('/students/university-equiv/credits', bearerAuth, (req, res, next) =>
         req.user.showCourseCredits(list)
         .then(results => {
           res.json(results);
-        });
+        })
+        .catch(next);
       });
     });
   })
@@ -113,8 +114,11 @@ router.post('/students/university-equiv', bearerAuth, (req, res, next) => {
             req.user.univ_classes.push(uwCourse);
           }
         });
-        req.user.save();
-        res.json(user);
+        req.user.save()
+        .then(user => {
+          user.password = null;
+          res.json(user);
+        });
       });
   });
 });

@@ -7,12 +7,9 @@ let PORT = process.env.PORT || 3000;
 
 describe('testing uwcourse routes', function(){
   let server;
-  let student;
   let token;
-  let uwCourse;
   let badToken = 'adfawr234q2345234';
   let uwCourseID;
-  let admin;
   let adminToken;
 
   before(function(done) {
@@ -28,12 +25,10 @@ describe('testing uwcourse routes', function(){
     uwtmp.save()
     .then(w => {
       uwCourseID = w._id;
-      uwCourse = w;
     });
 
     tmp.save()
     .then(u => {
-      student = u;
       u.generateToken()
       .then(tok => {
         token = tok;
@@ -42,7 +37,6 @@ describe('testing uwcourse routes', function(){
 
     tmpAdmin.save()
     .then(a => {
-      admin = a;
       a.generateToken()
       .then(aT => {
         adminToken = aT;

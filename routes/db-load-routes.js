@@ -13,7 +13,6 @@ router.get('/uwdata/:subject', (req, res, next) => {
   request.get('https://wseval.s.uw.edu:443/student/v5/course.json?year=2017&quarter=winter&curriculum_abbreviation=' + req.params.subject)
     .set('Authorization', 'Bearer ' + process.env.UW_TOKEN)
     .end((err, response) => {
-      let courses = [];
 
       response.body.Courses.map(ele => {
         return {description: ele.Href, longTitle: ele.CourseTitleLong, code: ele.CurriculumAbbreviation + ' ' + ele.CourseNumber, credits: 5};
@@ -26,7 +25,6 @@ router.get('/uwdata/:subject', (req, res, next) => {
             ele.description = resp.body.CourseDescription;
 
             let course = new UWCourse(ele);
-            courses.push(course);
             course.save();
           });
 

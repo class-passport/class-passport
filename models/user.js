@@ -82,7 +82,7 @@ userSchema.methods.showCourseEquivalents = function(objectArray) {
 //generates new object array of community college courses and the uw credit value to each course
 userSchema.methods.showCourseCredits = function(objectArray) {
   return new Promise((resolve, reject) => {
-    if(!objectArray) return reject(createError(401));
+    if(!objectArray) return reject(createError(400));
     let abbrevCourseList = objectArray.map(function(course) {
       if(course) {
         return({cccourse: course.ccequiv, uw_credits: course.credits});
@@ -97,7 +97,7 @@ userSchema.methods.showCourseCredits = function(objectArray) {
   });
 };
 
-//haven't used the method below yet. 
+//haven't used the method below yet.
 // userSchema.methods.generateCourseIds = function(objectArray) {
 //   return new Promise ((resolve, reject) => {
 //     if(!objectArray) return reject(createError(400));
