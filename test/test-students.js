@@ -41,7 +41,7 @@ describe('testing student routes', function() {
   let server;
 
   before(done => {
-    
+
     server = app.listen(PORT, () => console.log('started server from student tests'));
 
     new UWCourse(exampleUW).save()
@@ -156,7 +156,6 @@ describe('testing student routes', function() {
       .end((err, res) => {
         expect(res.status).to.equal(200);
         expect(res.body.currCourses[0].code).to.equal('MATH 151');
-        // expect(res.body.currCourses[0]._id).to.deep.equal(this.tempCCCourse._id); // can we get this to work? ObjectId problem, I think?
         done();
       });
     });
@@ -191,7 +190,7 @@ describe('testing student routes', function() {
         expect(res.body.courses.length).to.equal(1);
         expect(res.body.courses[0].cccourse).to.equal('MATH 151');
         expect(res.body.courses[0].uw_credits).to.equal(5);
-        expect(res.body.total_uw_credits).to.equal(5); //I think this has something to do with the reduce
+        expect(res.body.total_uw_credits).to.equal(5);
         done();
       });
     });
