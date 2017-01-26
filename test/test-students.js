@@ -181,13 +181,9 @@ describe('testing student routes', function() {
     });
 
     it('should return students total uw credits along with cccourses that transfer', done => {
-      console.log('THIS IS OUR FULL STUDENT', this.tempStudent);
-      console.log('OUR FULL CC COURSE', this.tempCCCourse);
-      console.log('OUR FULL UW COURSE', this.tempUWCourse);
       request.get('localhost:3000/students/university-equiv/credits')
       .set('Authorization', 'Bearer ' + this.tempStudent.token)
       .end((err, res) => {
-        console.log('THE BODY YO',res.body);
         expect(res.status).to.equal(200);
         expect(res.body.courses.length).to.equal(1);
         expect(res.body.courses[0].cccourse).to.equal('MATH 151');
@@ -261,17 +257,25 @@ describe('testing student routes', function() {
 
   describe('testing POST /students/university-equiv route', () => {
 
-    // it('should return array of student\'s cccourses and their uw equiv', done => {
-    //   request.post('localhost:3000/students/university-equiv')
-    //   .set('Authorization', 'Bearer ' + this.tempStudent.token)
-    //   .end((err, res) => {
-    //     expect(res.status).to.equal(200);
-    //     expect(res.body.length).to.equal(1);
-    //     expect(res.body[0].cccourse).to.equal('MATH 151');
-    //     expect(res.body[0].uwequiv).to.equal('MATH 124');
-    //     done();
-    //   });
-    // });
+    it('should return student\'s info with populated univ_classes', done => {
+      request.post('localhost:3000/students/university-equiv')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.univ_classes.length).to.equal(res.body.curr_courses.length);
+        done();
+      });
+    });
+
+    it('should not return student\'s password', done => {
+      request.post('localhost:3000/students/university-equiv')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.passwrod).to.not.exist;
+        done();
+      });
+    });
 
     it('should return 401 for an admin', done => {
       request.post('localhost:3000/students/university-equiv')

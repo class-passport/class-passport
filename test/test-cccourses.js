@@ -4,17 +4,12 @@ let app = require('../index.js');
 let User = require('../models/user');
 let CC = require('../models/cccourse');
 let PORT = process.env.PORT || 3000;
-let mongoose = require('mongoose');
-
 
 describe('testing cccourse routes', function(){
   let server;
-  let student;
   let token;
-  let course;
   let badToken = 'adfawr234q2345234';
   let courseID;
-  let admin;
   let adminToken;
 
 
@@ -29,17 +24,14 @@ describe('testing cccourse routes', function(){
 
     tmpAdmin.save()
     .then(a => {
-      admin = a;
       a.generateToken()
       .then(aT => {
         adminToken = aT;
-        console.log('token', adminToken);
       });
     });
 
     tmp.save()
     .then(u => {
-      student = u;
       u.generateToken()
       .then(tok => {
         token = tok;
@@ -50,7 +42,6 @@ describe('testing cccourse routes', function(){
     cmp.save()
     .then(c => {
       courseID = c._id;
-      course = c;
       done();
     });
   });
