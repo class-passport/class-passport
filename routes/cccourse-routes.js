@@ -49,7 +49,6 @@ router.get('/cccourses/:id', (req, res, next) => {
 
 router.put('/cccourses/:id', bearerAuth, (req, res, next) => {
   if(!req.user.admin) return next(createError(401));
-  console.log('user', req.user);
   // STUDENT: Not authorized
 
   // ADMIN: Only admin is permitted to update a course
@@ -68,7 +67,7 @@ router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
     return;
   }
   //STUDENT FUNCTIONALITY: Removes course from curr_courses
-  req.student.removeCurrCourse(req.params.id)
+  req.user.removeCurrCourse(req.params.id)
     .then(student => res.json(student))
     .catch(next);
 });

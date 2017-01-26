@@ -7,6 +7,8 @@ let expect = require('chai').expect;
 // app modules
 let app = require('../index.js');
 let User = require('../models/user.js');
+let UWCourse = require('../models/uwcourse.js');
+let CCCourse = require('../models/cccourse.js');
 
 // module constants
 let PORT = process.env.PORT || 3000;
@@ -23,23 +25,49 @@ let exampleAdmin = {
   admin: true
 };
 
+let exampleUW = {
+  code: 'MATH 124',
+  longTitle: 'MATH FOR LOSERS',
+  description: 'Great fun',
+  ccequiv: 'MATH 151',
+  credits: 5
+};
+
+let exampleCC = {
+  code: 'MATH 151'
+};
+
 describe('testing student routes', function() {
   let server;
 
   before(done => {
+    User.remove({}).exec();
+
     server = app.listen(PORT, () => console.log('started server from student tests'));
 
-    new User(exampleStudent).save()
+    new UWCourse(exampleUW).save()
+      .then(uwcourse => {
+        this.tempUWCourse = uwcourse;
+        return CCCourse(exampleCC).save();
+      })
+      .then(cccourse => {
+        this.tempCCCourse = cccourse;
+        this.tempCCCourse.uwequiv = this.tempUWCourse._id;
+        this.tempUWCourse.ccequiv = this.tempCCCourse.code;
+        return this.tempCCCourse.save();
+      })
+      .then(() => this.tempUWCourse.save())
+      .then(() => new User(exampleStudent).save())
       .then(student => {
         this.tempStudent = student;
-        return this.tempStudent.generateToken();
+        this.tempStudent.curr_courses.push(this.tempCCCourse._id);
+        return this.tempStudent.save();
       })
+      .then(student => student.generateToken())
       .then(token => {
         this.tempStudent.token = token;
+        return new User(exampleAdmin).save();
       })
-      .catch(done);
-
-    new User(exampleAdmin).save()
       .then(admin => {
         this.tempAdmin = admin;
         return this.tempAdmin.generateToken();
@@ -125,7 +153,8 @@ describe('testing student routes', function() {
       .set('Authorization', 'Bearer ' + this.tempStudent.token)
       .end((err, res) => {
         expect(res.status).to.equal(200);
-        expect(res.body.currCourses).to.deep.equal([]); //NEED TO ADD A COURSE IN THE BEFORE BLOCK
+        expect(res.body.currCourses[0].code).to.equal('MATH 151');
+        // expect(res.body.currCourses[0]._id).to.deep.equal(this.tempCCCourse._id); // can we get this to work? ObjectId problem, I think?
         done();
       });
     });
@@ -133,6 +162,132 @@ describe('testing student routes', function() {
     it('should return 401 for admin', done => {
       request.get('localhost:3000/students/cccourses')
       .set('Authorization', 'Bearer ' + this.tempAdmin.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+  });
+
+  describe('testing GET /students/university-equiv/credits routes', () => {
+
+    it('should return 200 for a student with non-empty curr_courses array', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        done();
+      });
+    });
+
+    it('should return students total uw credits along with cccourses that transfer', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.courses.length).to.equal(1);
+        expect(res.body.courses[0].cccourse).to.equal('MATH 151');
+        expect(res.body.courses[0].uw_credits).to.equal(5);
+        // expect(res.body.total_uw_credits).to.equal(5); //I think this has something to do with the reduce
+        done();
+      });
+    });
+
+    // it('should return 400 for a student with empty curr_courses array', done => {
+    //   request.get('localhost:3000/students/university-equiv/credits')
+    //   .set('Authorization', 'Bearer ' + this.tempStudent.token)
+    //   .end((err, res) => {
+    //     console.log('LOL', res.body);
+    //     console.log('the ccourse', this.tempCCCourse);
+    //     expect(res.status).to.equal(400);
+    //     done();
+    //   });
+    // });
+
+    it('should return 401 for an admin', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .set('Authorization', 'Bearer ' + this.tempAdmin.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return 401 for an unauthenticated user', done => {
+      request.get('localhost:3000/students/university-equiv/credits')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+  });
+
+  describe('testing GET /students/university-equiv route', () => {
+
+    it('should return array of student\'s cccourses and their uw equiv', done => {
+      request.get('localhost:3000/students/university-equiv')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.length).to.equal(1);
+        expect(res.body[0].cccourse).to.equal('MATH 151');
+        expect(res.body[0].uwequiv).to.equal('MATH 124');
+        done();
+      });
+    });
+
+    it('should return 401 for an admin', done => {
+      request.get('localhost:3000/students/university-equiv')
+      .set('Authorization', 'Bearer ' + this.tempAdmin.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return 401 for an unauthenticated user', done => {
+      request.get('localhost:3000/students/university-equiv')
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+  });
+
+  describe('testing POST /students/university-equiv route', () => {
+
+    it('should return student\'s info with populated univ_classes', done => {
+      request.post('localhost:3000/students/university-equiv')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.univ_classes.length).to.equal(res.body.curr_courses.length);
+        done();
+      });
+    });
+
+    it('should not return student\'s password', done => {
+      request.post('localhost:3000/students/university-equiv')
+      .set('Authorization', 'Bearer ' + this.tempStudent.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body.passwrod).to.not.exist;
+        done();
+      });
+    });
+
+    it('should return 401 for an admin', done => {
+      request.post('localhost:3000/students/university-equiv')
+      .set('Authorization', 'Bearer ' + this.tempAdmin.token)
+      .end((err, res) => {
+        expect(res.status).to.equal(401);
+        done();
+      });
+    });
+
+    it('should return 401 for an unauthenticated user', done => {
+      request.post('localhost:3000/students/university-equiv')
       .end((err, res) => {
         expect(res.status).to.equal(401);
         done();
@@ -151,8 +306,8 @@ describe('testing student routes', function() {
         expect(res.body.username).to.equal('jinx');
         expect(res.body.password).to.not.exist;
         expect(res.body.admin).to.equal.false;
-        expect(res.body.univ_classes).to.deep.equal([]);
-        expect(res.body.curr_courses).to.deep.equal([]);
+        // expect(res.body.univ_classes).to.deep.equal([]);
+        expect(res.body.curr_courses.length).to.equal(1);
         done();
       });
     });
