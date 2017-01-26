@@ -13,9 +13,6 @@ describe('testing uwcourse routes', function(){
   let adminToken;
 
   before(function(done) {
-    User.remove({}).exec()
-        .then(UW.remove({}).exec());
-
     server = app.listen(PORT, () => console.log('started tests from uwcourse tests'));
 
     let tmpAdmin = new User({username: 'franklinhardesty', password: 'testpass', admin: true});
@@ -47,12 +44,15 @@ describe('testing uwcourse routes', function(){
   });
 
   after(function(done) {
-    server.close(() => console.log('server closed after uwcourse tests'));
-    done();
+    User.remove({})
+    .then(() => UW.remove({}))
+    .then(() => {
+      server.close(() => console.log('server closed after uwcourse tests'));
+      done();
+    })
+    .catch(done);
   });
 
-
-  //Unregistered route
   describe('testing unregistered route', function(){
     it('should return 404 for an unregistered route', function(done) {
       request.get('http://localhost:3000/stuff')
@@ -62,7 +62,6 @@ describe('testing uwcourse routes', function(){
       });
     });
   });
-
 
   // test POST errors/messages
   describe('testing POST /uwcourse functionality', function(){
@@ -117,8 +116,7 @@ describe('testing uwcourse routes', function(){
       });
     });
   });
-//
-//
+
 // test GET functionality
   describe('testing GET /uwcourse functionality', function(){
     it('should return all courses offered by UW for an unauthenticated user', function(done){
@@ -131,7 +129,7 @@ describe('testing uwcourse routes', function(){
     });
   });
 
-  // // test PUT functionality
+  // test PUT functionality
   describe('testing PUT /uwcourse functionality', function(){
     it('will allow an admin to update an existing course within the UW course list', function(done) {
       request.put('localhost:3000/uwcourses/' + uwCourseID)
@@ -186,7 +184,6 @@ describe('testing uwcourse routes', function(){
     });
   });
 
-
   // test DELETE functionality
   describe('testing DELETE /uwcourse functionality', function(){
     it('should allow an admin to delete a course from the UW course listing', function(done){
@@ -197,6 +194,7 @@ describe('testing uwcourse routes', function(){
         done();
       });
     });
+
     it('should not allow a student to delete a course from the UW course listing', function(done) {
       request.delete('localhost:3000/uwcourses/' + uwCourseID)
       .set('Authoriziation', 'Bearer ' + token)
@@ -206,5 +204,5 @@ describe('testing uwcourse routes', function(){
       });
     });
   });
-//end of file
+
 });
