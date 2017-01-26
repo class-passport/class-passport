@@ -91,7 +91,13 @@ userSchema.methods.showCourseCredits = function(objectArray) {
     //creates new object that includes total uw credits student could receive for current classes
     let creditsResult = {
       courses: abbrevCourseList,
-      total_uw_credits: objectArray.reduce((a, b) => a.credits + b.credits)
+      total_uw_credits: function getCredits(array) {
+        if(array.length === 1) {
+          return array.map((a) => a.credits)[0];
+        } else {
+          return array.reduce((a, b) => a.credits + b.credits);
+        }
+      }(objectArray)
     };
     resolve(creditsResult);
   });
