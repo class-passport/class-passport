@@ -1,3 +1,5 @@
+'use strict';
+
 let request = require('superagent');
 let expect = require('chai').expect;
 let app = require('../index.js');
@@ -227,7 +229,7 @@ describe('testing cccourse routes', function(){
         done();
       });
     });
-    
+
     it('should allow an admin to delete a course from the cc course listing', function(done){
       request.delete('localhost:3000/cccourses/' + courseID)
       .set('Authorization', 'Bearer ' + adminToken)

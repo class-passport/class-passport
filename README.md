@@ -1,5 +1,5 @@
 # Class Passport
-[![Build Status](https://travis-ci.org/jessicamvs/back-end-project.svg?branch=master)](https://travis-ci.org/jessicamvs/back-end-project) [![Coverage Status](https://coveralls.io/repos/github/jessicamvs/back-end-project/badge.svg?branch=jessica-student-testing2)](https://coveralls.io/github/jessicamvs/back-end-project?branch=jessica-student-testing2)
+[![Build Status](https://travis-ci.org/jessicamvs/back-end-project.svg?branch=master)](https://travis-ci.org/jessicamvs/back-end-project) [![Coverage Status](https://coveralls.io/repos/github/jessicamvs/back-end-project/badge.svg)](https://coveralls.io/github/jessicamvs/back-end-project?branch=staging)
 
 An app that helps users easily plan transferring from a 2 Year Community College to a 4 Year University. A user can input their current Community College course list, and receive an output detailing whether each of those courses are transferrable as well as how many credits will successfully transfer. If a Community College course is not transferrable, a user can easily change their course input. The application allows both students and administrators to manage their respective course listings.  
 
@@ -170,4 +170,4 @@ Administrators are allowed, while authenticated, to delete existing courses with
 + [Jessica Vasquez-Soltero](https://github.com/jessicamvs "Jessica's Github")
 + [Jonathan Daniel](https://github.com/spamalope01 "Jonathan's Github")
 + [Jacob Isenberg](https://github.com/jisenber "Jacob's Github")
-+ [Carolina Vasquez-Ceja](http://github.com/cejac "Carolina's Github") 
++ [Carolina Vasquez-Ceja](http://github.com/cejac "Carolina's Github")

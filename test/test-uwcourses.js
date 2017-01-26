@@ -1,3 +1,5 @@
+'use strict';
+
 let request = require('superagent');
 let expect = require('chai').expect;
 let app = require('../index.js');
