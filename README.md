@@ -167,7 +167,7 @@ Administrators are allowed, while authenticated, to delete existing courses with
 - Eslint
 
 ## Contributors
-    Jessica Vasquez-Soltero
-    Jonathan Daniel
-    Jacob Isenberg
-    Carolina Vasquez-Ceja
++ [Jessica Vasquez-Soltero](https://github.com/jessicamvs "Jessica's Github")
++ [Jonathan Daniel](https://github.com/spamalope01 "Jonathan's Github")
++ [Jacob Isenberg](https://github.com/jisenber "Jacob's Github")
++ [Carolina Vasquez-Ceja](http://github.com/cejac "Carolina's Github") 
