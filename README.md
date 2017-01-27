@@ -30,7 +30,6 @@ git clone https://github.com/jessicamvs/back-end-project.git
 #### POST /signup
 A new user is authenticated by signing up with a unique username and password. Specifying whether you are an admin or not upon signup will allow you access to certain routes. Upon success, users are returned a token which provides authorization to access certain routes.
   - Expected Header:
-
   ```
   Content-Type: 'application/json'
   ```
@@ -59,10 +58,10 @@ A returning user will be required to provide their unique username and password 
 
 - Example Response (token):
  ```
- eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU4ODk1ODFmZDA0ZDFhMmIyOWM5NjQyZCIsImlhdCI6MTQ4NTM5NTk5OX0.8_Zijpib85BGwh99IUHlrGjhT59EzigyTp8fssgSE48
+ "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU4OGI3Y2ZhMDIyYmI5MDJlYmI2MzA3MSIsImlhdCI6MTQ4NTUzNjUwNn0.kTXbq-oMFrM3OTvb93xagRniLRdOGgcr3onINgEMaW0"
  ```
 
-#### Login/Signup Error Handling
+#### Error Responses for Login/Signup
 - 200 upon successful signup or login
 - 400 BadRequestError if no username provided upon signup
 - 400 BadRequestError if no password provided upon signup
@@ -76,7 +75,7 @@ These routes will allow both students and administrators to input new courses as
 
 #### POST /cccourses
 
-__Students__ can, while authenticated, only add new Community College courses to their personal list.  They are not allowed to post courses to the primary Community College course list.
+__Students__ can, while authenticated, only add new Community College courses to their personal list.  They are not allowed to post courses to the primary Community College course list. Upon success the student's profile will be returned with a Community College course id added to their curr_courses array..
 
 - Expected Header
 ```
@@ -88,6 +87,21 @@ Authorization: Bearer <token>
 ```js
 {
   "code": <string>
+}
+```
+
+- Example Response:
+```js
+{
+  "_id": "588b7cc4022bb902ebb6306e",
+  "username": "jessica",
+  "password": null,
+  "admin": false,
+  "__v": 1,
+  "univ_classes": [],
+  "curr_courses": [
+    "588b805b022bb902ebb63076"
+  ]
 }
 ```
 
@@ -95,6 +109,7 @@ __Administrators__ can, while authenticated, only add new courses to the primary
 
 - Expected Header
 ```
+Content-Type: 'application/json'
 Authorization: Bearer <token>
 ```
 
@@ -109,10 +124,10 @@ Authorization: Bearer <token>
 - Example Response:
 ```js
 {
-"_id" : ObjectId("58894cb309ecbe1d2700c0ef"),
-"code" : "MATH 151",
-"uwequiv" : ObjectId("58894cb309ecbe1d2700c0ee")
-"__v" : 0,
+  "_id": "588b8343022bb902ebb6307b",
+  "code": "MATH 151",
+  "uwequiv": "588b8206022bb902ebb6307a",
+  "__v": 0
 }
 ```
 
@@ -120,20 +135,26 @@ Authorization: Bearer <token>
 Students, Admins, and unauthenticated users can access this route and receive a full listing of all available Community College courses.
 
 - Example Response:
-
-``` javascript
-{ _id: ObjectId('588ade5b1876df938d1b309a'),
-code: 'MATH 151',
-uwequiv: ObjectId('588addb41876df938d1b3095'),
-__v: 0 },
-{ _id: ObjectId('588ade941876df938d1b309b'),
-code: 'MATH 152',
-uwequiv: ObjectId('588addb41876df938d1b3093'),
-__v: 0 }
+``` js
+[
+  {
+    "_id": "588b8343022bb902ebb6307b",
+    "code": "MATH 151",
+    "uwequiv": "588b8206022bb902ebb6307a",
+    "__v": 0
+  },
+  {
+    "_id": "588b805b022bb902ebb63076",
+    "code": "ENGL 101",
+    "__v": 0
+  }
+]
 ```
 
 #### PUT /cccourses/:id
-__Administrators__ can, while authenticated, update existing courses within the primary Community College course list. They are not allowed to update any student's current courses.
+__Students__ do not have access to this route. They are not allowed to update a course.
+
+__Administrators__ can, while authenticated, update existing courses within the primary Community College course list. They are not allowed to update any student's current courses. The updated course will be returned upon success.
 
 - Expected Header
 ```
@@ -149,17 +170,27 @@ Authorization: Bearer <token>
 }
 ```
 
+- Example Response:
+``` js
+{
+  "_id": "588b8343022bb902ebb6307b",
+  "code": "CHEM 124",
+  "uwequiv": "588b8206022bb902ebb6307a",
+  "__v": 0
+}
+```
+
 #### DELETE /cccourses/:id
-__Students__ are allowed, while authenticated, to delete courses by id from their personal course list only.  They may not remove courses from the primary Community College course list.
+__Students__ are allowed, while authenticated, to delete courses by id from their personal course list only. They may not remove courses from the primary Community College course list.
 
 __Administrators__ are allowed, while authenticated, to delete existing courses by id within the primary Community College course list. They are not allowed to delete courses within any student listing.
 
-- Expected Header
+- Expected Header:
 ```
 Authorization: Bearer <token>
 ```
 
-#### Error Responses for CCCourses Routes
+#### Error Responses for CCCourses
 - 200 - Everything is OK (You're cool.)
 - 204 - No Content (Delete route worked.)
 - 400 - Bad Request (You did something wrong.)
@@ -168,7 +199,7 @@ Authorization: Bearer <token>
 - 500 - Internal Server Error (You'd better call someone.)
 
 ### University of Washington Course Routes
-These routes are only accessible to administrators. They may add, read, edit, and delete university courses.
+Only an administrator may add, edit, and delete university courses. All users may get a full list of courses offered at the university.
 
 #### POST /uwcourses
 __Administrators__ can, while authenticated, add new university courses to the primary university course list. They may provide the equivalent community college course but it is not required. The new course will be returned upon success.
@@ -226,12 +257,11 @@ Students, Admins, and unauthenticated users can access this route and receive a 
     "credits": 5,
     "__v": 0
   }
-  ...
 ]
 ```
 
 #### PUT /uwcourses/:id
-__Administrators__ can, while authenticated, update existing courses by id within the primary university course list. The updated course will be returned.
+__Administrators__ can, while authenticated, update existing courses by id within the primary university course list. The updated course will be returned upon success.
 
 - Expected Header
 ```
@@ -256,6 +286,12 @@ __Administrators__ are allowed, while authenticated, to delete existing courses 
 ```
 Authorization: Bearer <token>
 ```
+
+#### Error Responses for UWCourses
+- 200 - Success
+- 204 - Delete was successful
+- 400 - Bad Request
+- 401 - Not Authorized
 
 ## Testing Framework
 - Mocha
