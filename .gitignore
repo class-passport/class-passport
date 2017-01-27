@@ -1,5 +1,6 @@
 # secrets
 secrets
+.coveralls.yml
 
 # ignore db directories
 db
