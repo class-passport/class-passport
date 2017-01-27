@@ -57,7 +57,7 @@ A returning user will be required to provide their unique username and password 
   ```
 
 - Example Response (token):
- ```js
+ ```
  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU4OGI3Y2ZhMDIyYmI5MDJlYmI2MzA3MSIsImlhdCI6MTQ4NTUzNjUwNn0.kTXbq-oMFrM3OTvb93xagRniLRdOGgcr3onINgEMaW0"
  ```
 
@@ -171,7 +171,7 @@ Authorization: Bearer <token>
 ```
 
 - Example Response:
-```
+``` js
 {
   "_id": "588b8343022bb902ebb6307b",
   "code": "CHEM 124",
