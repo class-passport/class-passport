@@ -34,7 +34,7 @@ A new user is authenticated by signing up with a unique username and password. S
   ```
   Content-Type: 'application/json'
   ```
-  - Expected Body:
+  - Expected JSON Body:
     ``` js
     {
     "username": <string>,
@@ -84,10 +84,10 @@ Content-Type: 'application/json'
 Authorization: Bearer <token>
 ```
 
-- Expected Body:
+- Expected JSON Body:
 ```js
 {
-  code: <string>
+  "code": <string>
 }
 ```
 
@@ -98,11 +98,11 @@ __Administrators__ can, while authenticated, only add new courses to the primary
 Authorization: Bearer <token>
 ```
 
-- Expected Body:
+- Expected JSON Body:
 ``` js
 {
-  code: <string>
-  uwequiv: <ObjectId>
+  "code": <string>
+  "uwequiv": <ObjectId>
 }
 ```
 
@@ -141,11 +141,11 @@ Content-Type: 'application/json'
 Authorization: Bearer <token>
 ```
 
-- Expected Body:
+- Expected JSON Body:
 ``` js
 {
-  code: <string>
-  uwequiv: <ObjectId>
+  "code": <string>
+  "uwequiv": <ObjectId>
 }
 ```
 
@@ -179,7 +179,17 @@ Content-Type: 'application/json'
 Authorization: Bearer <token>
 ```
 
-- Expected Response:
+- Expected JSON Body
+```js
+{
+  "description": <string>
+  "code": <string>
+  "ccequiv": <string>
+  "credits": <number>
+}
+```
+
+- Example Response:
 ```js
 {
   "_id": "588addb41876df938d1b3093",
@@ -192,12 +202,10 @@ Authorization: Bearer <token>
 }
 ```
 
-
 #### GET /uwcourses
 Students, Admins, and unauthenticated users can access this route and receive a full listing of all available university courses.
 
 - Example Response:
-
 ```js
 [
   {
@@ -231,7 +239,7 @@ Content-Type: 'application/json'
 Authorization: Bearer <token>
 ```
 
-- Expected Body:
+- Expected JSON Body:
 ```js
 {
   "description": <string>
