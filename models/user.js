@@ -1,7 +1,7 @@
 'use strict';
 
 let mongoose = require('mongoose');
-let bcrypt = require('bcrypt');
+let bcrypt = require('bcryptjs');
 let createError = require('http-errors');
 let jwt = require('jsonwebtoken');
 

@@ -19,20 +19,18 @@ router.post('/cccourses', bearerAuth, (req, res, next) => {
       .catch(next);
   } else {
     CCCourse.findAndAddCourse(req.body.code, req.user)
-    .then(user => res.json(user))
+    .then(user => {
+      user.password = null;
+      res.json(user);
+    })
     .catch(next);
   }
 });
 
 router.get('/cccourses', (req, res, next) => {
   CCCourse.find({})
-   .then(courses => {
-     courses.forEach(function(course) {
-       res.write(course + '\n');
-     });
-     res.end();
-   })
-  .catch(next);
+   .then(courses => res.json(courses))
+   .catch(next);
 });
 
 router.get('/cccourses/:id', (req, res, next) => {
@@ -61,6 +59,6 @@ router.delete('/cccourses/:id', bearerAuth, function(req, res, next) {
     return;
   }
   req.user.removeCurrCourse(req.params.id)
-    .then(student => res.json(student))
+    .then(() => res.status(204).end())
     .catch(next);
 });

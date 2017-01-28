@@ -1,3 +1,5 @@
+'use strict';
+
 let request = require('superagent');
 let expect = require('chai').expect;
 let app = require('../index.js');
@@ -146,7 +148,7 @@ describe('testing cccourse routes', function(){
       request.get('localhost:3000/cccourses')
       .end((err, res) => {
         expect(res.status).to.equal(200);
-        expect(res.text).to.contain('Eng 101');
+        expect(res.body[0].code).to.equal('Eng 101');
         done();
       });
     });
@@ -223,11 +225,12 @@ describe('testing cccourse routes', function(){
       request.delete('localhost:3000/cccourses/' + courseID)
       .set('Authorization', 'Bearer ' + token)
       .end((err, res) => {
-        expect(res.body.curr_courses).to.not.contain(courseID);
+        expect(res.status).to.equal(204);
+        expect(res.body).to.deep.equal({});
         done();
       });
     });
-    
+
     it('should allow an admin to delete a course from the cc course listing', function(done){
       request.delete('localhost:3000/cccourses/' + courseID)
       .set('Authorization', 'Bearer ' + adminToken)
