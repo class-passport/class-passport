@@ -293,6 +293,151 @@ Authorization: Bearer <token>
 - 400 - Bad Request
 - 401 - Not Authorized
 
+### Student Routes
+
+#### POST /students/university-equiv
+An authenticated __Student__ can post their university class equivalents to their profile so it will persist and always be available for them to quickly look up (instead of running a process that must do multiple database look-ups). The return value is the user object with the unique ID of the university course added in the user's _univ_courses_ property
+
+- Expected Header
+```
+Content-Type: 'application/json'
+Authorization: Bearer <token>
+```
+
+- Expected JSON Body:
+```js
+{
+  "code": <string>
+}
+```
+- Expected Response:
+```js
+
+{
+  "_id":"588d111ef6850362f22195c7",
+  "username":"Herbert",
+  "password":null,"__v":3,
+  "univ_classes":["588d3098f51cda63512800bd","588d30c7f51cda63512800be"],
+  "curr_courses":["588d2bf532e9f46312fb3ffc","588d2c0332e9f46312fb3ffd"]}
+}
+```
+
+#### GET /students
+An authenticated __Student__ can look at all the properties of their profile (except their password).
+A successful request will return an object that has the equivalent properties of what one sees in the user model (unique ID, username, current courses, UW courses, credits, admin)
+
+- Expected Response
+```js
+{
+  "_id":"588d111ef6850362f22195c7",
+  "username":"Herbert",
+  "password":null,
+  "__v":2,
+  "univ_classes":[],
+  "curr_courses":["588d2bf532e9f46312fb3ffc","588d2c0332e9f46312fb3ffd"]
+}
+```
+
+#### GET /students/cccourses
+An authenticated __Student__ can look specifically at the current community college courses they are taking (in case they don't want their entire profile, and forgot what courses they signed up for). The route will populate more details about the course than what can be seen from the student profile snapshot.
+
+- Expected Response:
+```js
+  [
+    {"_id":"588d2bf532e9f46312fb3ffc",
+      "code":"Math 151",
+      "uwequiv":"588d3098f51cda63512800bd",
+      "__v":0
+    },
+    {"_id":"588d2c0332e9f46312fb3ffd",
+    "code":"Chem 200",
+    "uwequiv":"588d30c7f51cda63512800be",
+    "__v":0}
+  ]
+```
+
+#### GET /students/university-equiv
+An authenticated __Student__ look can use this route to see a side by side comparison of the community college course they are taking matched next to the equivalent university course. any community college courses that do not have university equivalents will not appear on the returned object.
+
+- Expected Response:
+```js
+[
+  {
+    "cccourse":"Math 151",
+    "uwequiv":"Math 142"
+  },
+  {
+    "cccourse":"Chem 200",
+    "uwequiv":"Chem 142"
+  }
+]
+```
+
+#### GET /students/university-equiv/credits
+An authenticated __Student__ can look the credits that their current community college classes would earn them at a university. The object returned is a side by side look at the student's community college course and the number of credits that the course is worth. The object also contains the sum of all the credits from the courses the student is taking.
+
+- Expected Response:
+```js
+{
+  "courses":
+  [
+    {
+      "cccourse":"Math 151",
+      "uw_credits":5
+    },
+    {
+      "cccourse":"Chem 200",
+      "uw_credits":5
+    }
+  ],
+    "total_uw_credits":10
+}
+
+```
+
+#### PUT /students
+An authenticated __Student__ or __Admin__ can change/update their username when making a put request on this route. A successful request will give a response with the user's updated profile information.
+
+- Expected Header
+```
+Content-Type: 'application/json'
+Authorization: Bearer <token>
+```
+
+- Expected JSON Body:
+```js
+{
+  "username": <string>
+}
+```
+- Expected Response
+```js
+
+{
+  "_id":"588d111ef6850362f22195c7",
+  "username":"Scott Schmidt",
+  "password":null,
+  "__v":3,
+  "univ_classes":["588d3098f51cda63512800bd","588d30c7f51cda63512800be"],
+  "curr_courses":["588d2bf532e9f46312fb3ffc","588d2c0332e9f46312fb3ffd"]
+}
+```
+
+### DELETE /students
+An authenticated __student__ can delete their profile if they want. Upon success no body will be returned
+
+- Expected Header
+```
+Authorization: Bearer <token>
+```
+
+#### Error Responses for Students
+- 200 - Success
+- 204 - Delete was successful
+- 400 - Bad Request
+- 401 - Not Authorized
+- 404 - Not Found
+
 ## Testing Framework
 - Mocha
 - Chai (Expect)
